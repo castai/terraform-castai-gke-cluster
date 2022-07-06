@@ -40,7 +40,7 @@ resource "helm_release" "castai_agent" {
   }
 
   set_sensitive {
-    name  = "apiKey"
+    name  = "apiKey.value"
     value = castai_gke_cluster.castai_cluster.cluster_token
   }
 }
