@@ -26,12 +26,6 @@ variable "delete_nodes_on_disconnect" {
   default     = false
 }
 
-variable "ssh_public_key" {
-  type        = string
-  description = "Optional SSH public key for VM instances. Accepted values are base64 encoded SSH public key or AWS key pair ID"
-  default     = null
-}
-
 variable "gke_cluster_location" {
   type        = string
   description = "Location of the cluster to be connected to CAST AI. Can be region or zone for zonal clusters"
@@ -44,7 +38,24 @@ variable "gke_credentials" {
 }
 
 variable "castai_components_labels" {
-  type = map
+  type        = map
   description = "Optional additional Kubernetes labels for CAST AI pods"
-  default = {}
+  default     = {}
+}
+
+variable "node_configurations" {
+  type = map(object({
+    disk_cpu_ratio = optional(number)
+    subnets        = list(string)
+    ssh_public_key = optional(string)
+    image          = optional(string)
+    tags           = optional(map(string))
+  }))
+  description = "Map of GKE node configurations to create"
+  default     = {}
+}
+
+variable "default_node_configuration" {
+  type        = string
+  description = "ID of the default node configuration"
 }

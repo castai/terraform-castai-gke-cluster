@@ -2,9 +2,21 @@ resource "castai_gke_cluster" "castai_cluster" {
   project_id                 = var.project_id
   location                   = var.gke_cluster_location
   name                       = var.gke_cluster_name
-  ssh_public_key             = var.ssh_public_key
   delete_nodes_on_disconnect = var.delete_nodes_on_disconnect
   credentials_json           = var.gke_credentials
+}
+
+resource "castai_node_configuration" "this" {
+  for_each = {for k, v in var.node_configurations : k => v}
+
+  cluster_id = castai_eks_cluster.castai_cluster.id
+
+  name           = try(each.value.name, each.key)
+  disk_cpu_ratio = try(each.value.disk_cpu_ratio, 25)
+  subnets        = try(each.value.subnets, null)
+  ssh_public_key = try(each.value.ssh_public_key, null)
+  image          = try(each.value.image, null)
+  tags           = try(each.value.tags, {})
 }
 
 resource "helm_release" "castai_agent" {
@@ -14,7 +26,7 @@ resource "helm_release" "castai_agent" {
   namespace        = "castai-agent"
   create_namespace = true
   cleanup_on_fail  = true
-  wait = true
+  wait             = true
 
   set {
     name  = "provider"
@@ -22,7 +34,7 @@ resource "helm_release" "castai_agent" {
   }
 
   set {
-    name = "additionalEnv.STATIC_CLUSTER_ID"
+    name  = "additionalEnv.STATIC_CLUSTER_ID"
     value = castai_gke_cluster.castai_cluster.id
   }
 
@@ -60,7 +72,7 @@ resource "helm_release" "castai_evictor" {
   namespace        = "castai-agent"
   create_namespace = true
   cleanup_on_fail  = true
-  wait = true
+  wait             = true
 
   set {
     name  = "replicaCount"
@@ -89,7 +101,7 @@ resource "helm_release" "castai_cluster_controller" {
   namespace        = "castai-agent"
   create_namespace = true
   cleanup_on_fail  = true
-  wait = true
+  wait             = true
 
   set {
     name  = "castai.clusterID"
