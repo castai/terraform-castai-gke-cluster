@@ -34,6 +34,17 @@ module "castai_gke_cluster" {
   delete_nodes_on_disconnect = var.delete_nodes_on_disconnect
   autoscaler_policies_json      = var.autoscaler_policies_json
 
+  default_node_configuration = module.castai_gke_cluster.node_configurations["default"]
+
+  node_configurations = {
+    default = {
+      disk_cpu_ratio = 25
+      subnets        = [module.vpc.subnets_ids[0]]
+      tags           = {
+        "node-config" : "default"
+      }
+    }
+  }
 }
 ```
 
@@ -45,7 +56,7 @@ module "castai_gke_cluster" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 0.25.0 |
+| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 0.26.3 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >=2.0.0 |
 
@@ -53,7 +64,7 @@ module "castai_gke_cluster" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 0.25.0 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 0.26.3 |
 | <a name="provider_helm"></a> [helm](#provider\_helm) | >=2.0.0 |
 
 ## Modules

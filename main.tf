@@ -9,7 +9,7 @@ resource "castai_gke_cluster" "castai_cluster" {
 resource "castai_node_configuration" "this" {
   for_each = {for k, v in var.node_configurations : k => v}
 
-  cluster_id = castai_eks_cluster.castai_cluster.id
+  cluster_id = castai_gke_cluster.castai_cluster.id
 
   name           = try(each.value.name, each.key)
   disk_cpu_ratio = try(each.value.disk_cpu_ratio, 25)
