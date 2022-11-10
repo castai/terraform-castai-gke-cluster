@@ -9,7 +9,7 @@ terraform {
     }
     castai = {
       source  = "castai/castai"
-      version = ">= 0.26.3"
+      version = ">= 1.3.0"
     }
   }
   required_version = ">= 0.13"

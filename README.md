@@ -56,7 +56,7 @@ module "castai_gke_cluster" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 0.26.3 |
+| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 1.3.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >=2.0.0 |
 
@@ -64,7 +64,7 @@ module "castai_gke_cluster" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 0.26.3 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 1.3.0 |
 | <a name="provider_helm"></a> [helm](#provider\_helm) | >=2.0.0 |
 
 ## Modules
@@ -95,7 +95,7 @@ No modules.
 | <a name="input_gke_cluster_location"></a> [gke\_cluster\_location](#input\_gke\_cluster\_location) | Location of the cluster to be connected to CAST AI. Can be region or zone for zonal clusters | `string` | n/a | yes |
 | <a name="input_gke_cluster_name"></a> [gke\_cluster\_name](#input\_gke\_cluster\_name) | Name of the cluster to be connected to CAST AI. | `string` | n/a | yes |
 | <a name="input_gke_credentials"></a> [gke\_credentials](#input\_gke\_credentials) | Optional GCP Service account credentials.json | `string` | n/a | yes |
-| <a name="input_node_configurations"></a> [node\_configurations](#input\_node\_configurations) | Map of GKE node configurations to create | <pre>map(object({<br>    disk_cpu_ratio = optional(number)<br>    subnets        = list(string)<br>    ssh_public_key = optional(string)<br>    image          = optional(string)<br>    tags           = optional(map(string))<br>  }))</pre> | `{}` | no |
+| <a name="input_node_configurations"></a> [node\_configurations](#input\_node\_configurations) | Map of GKE node configurations to create | `any` | `{}` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | The project id from GCP | `string` | n/a | yes |
 
 ## Outputs
