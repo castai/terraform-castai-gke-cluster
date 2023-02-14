@@ -40,7 +40,8 @@ module "castai-gke-cluster" {
         "node-config" : "default"
       }
       gke = {
-        max_pods_per_node =110
+        max_pods_per_node = 110
+        network_tags      = ["dev"]
       }
     }
   }
@@ -51,17 +52,17 @@ module "castai-gke-cluster" {
 
       should_taint = true
       custom_label = {
-        key = "custom-key"
+        key   = "custom-key"
         value = "label-value"
       }
 
       constraints = {
         fallback_restore_rate_seconds = 1800
-        spot = true
-        use_spot_fallbacks = true
-        min_cpu = 4
-        max_cpu = 100
-        instance_families = {
+        spot                          = true
+        use_spot_fallbacks            = true
+        min_cpu                       = 4
+        max_cpu                       = 100
+        instance_families             = {
           exclude = ["e2"]
         }
         compute_optimized = false
