@@ -45,6 +45,7 @@ module "castai_gke_cluster" {
       }
       gke = {
         max_pods_per_node = 110
+        network_tags      = ["dev"]
       }
     }
   }
