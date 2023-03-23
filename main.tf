@@ -46,6 +46,8 @@ resource "castai_node_template" "this" {
     }
   }
 
+  custom_labels = try(each.value.custom_labels, {})
+
   dynamic "custom_taints" {
     for_each = flatten([lookup(each.value, "custom_taints", [])])
 

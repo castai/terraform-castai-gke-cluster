@@ -54,9 +54,10 @@ module "castai_gke_cluster" {
       configuration_id = module.castai_gke_cluster.node_configurations["default"]
 
       should_taint = true
-      custom_label = {
-        key = "custom-key"
-        value = "label-value"
+
+      custom_labels = {
+        custom-label-key-1 = "custom-label-value-1"
+        custom-label-key-2 = "custom-label-value-2"
       }
 
       custom_taints = [
@@ -97,7 +98,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 3.2.0 |
+| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 3.3.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.0.0 |
 
@@ -105,7 +106,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 3.2.0 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 3.3.0 |
 | <a name="provider_helm"></a> [helm](#provider\_helm) | >= 2.0.0 |
 
 ## Modules
