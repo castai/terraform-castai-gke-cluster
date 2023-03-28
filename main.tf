@@ -33,9 +33,10 @@ resource "castai_node_template" "this" {
 
   cluster_id = castai_gke_cluster.castai_cluster.id
 
-  name             = try(each.value.name, each.key)
-  configuration_id = try(each.value.configuration_id, null)
-  should_taint     = try(each.value.should_taint, true)
+  name                      = try(each.value.name, each.key)
+  configuration_id          = try(each.value.configuration_id, null)
+  should_taint              = try(each.value.should_taint, true)
+  custom_instances_enabled  = try(each.value.custom_instances_enabled, false)
 
   dynamic "custom_label" {
     for_each = flatten([lookup(each.value, "custom_label", [])])
