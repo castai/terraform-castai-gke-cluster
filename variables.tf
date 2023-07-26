@@ -4,6 +4,12 @@ variable "api_url" {
   default     = "https://api.cast.ai"
 }
 
+variable "api_token" {
+  type = string
+  description = "CAST AI API token created in console.cast.ai API Access keys section."
+  sensitive = true
+}
+
 variable "project_id" {
   type        = string
   description = "The project id from GCP"
@@ -94,4 +100,10 @@ variable "kvisor_values" {
   description = "List of YAML formatted string values for kvisor helm chart"
   type        = list(string)
   default     = []
+}
+
+variable "wait_for_cluster_ready" {
+  type        = bool
+  description = "Wait for cluster to be ready before finishing the module execution"
+  default     = true
 }

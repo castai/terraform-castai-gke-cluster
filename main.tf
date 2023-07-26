@@ -210,6 +210,19 @@ resource "helm_release" "castai_cluster_controller" {
   }
 }
 
+resource "null_resource" "wait_for_cluster" {
+  count = var.wait_for_cluster_ready ? 1 : 0
+  depends_on = [helm_release.castai_cluster_controller, helm_release.castai_agent]
+
+  provisioner "local-exec" {
+    command = <<-EOT
+        while ! curl ${var.api_url}/v1/kubernetes/external-clusters/${castai_gke_cluster.castai_cluster.id} -H "x-api-key: ${var.api_token}" | grep '"status"\s*:\s*"ready"'; do sleep 5; done
+    EOT
+
+    interpreter = ["bash", "-c"]
+  }
+}
+
 resource "helm_release" "castai_spot_handler" {
   name             = "castai-spot-handler"
   repository       = "https://castai.github.io/helm-charts"
