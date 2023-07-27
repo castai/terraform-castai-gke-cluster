@@ -217,7 +217,7 @@ resource "null_resource" "wait_for_cluster" {
   provisioner "local-exec" {
     quiet = true
     environment = {
-      API_KEY = var.api_token
+      API_KEY = var.castai_api_token
     }
     command = <<-EOT
         RETRY_COUNT=20
