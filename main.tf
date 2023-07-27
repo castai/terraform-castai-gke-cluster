@@ -215,8 +215,21 @@ resource "null_resource" "wait_for_cluster" {
   depends_on = [helm_release.castai_cluster_controller, helm_release.castai_agent]
 
   provisioner "local-exec" {
+    quiet = true
+    environment = {
+      API_KEY = var.api_token
+    }
     command = <<-EOT
-        while ! curl ${var.api_url}/v1/kubernetes/external-clusters/${castai_gke_cluster.castai_cluster.id} -H "x-api-key: ${var.api_token}" | grep '"status"\s*:\s*"ready"'; do sleep 5; done
+        RETRY_COUNT=20
+        POOLING_INTERVAL=30
+
+        for i in $(seq 1 $RETRY_COUNT); do
+            sleep $POOLING_INTERVAL
+            curl -s ${var.api_url}/v1/kubernetes/external-clusters/${castai_gke_cluster.castai_cluster.id} -H "x-api-key: $API_KEY" | grep '"status"\s*:\s*"ready"' && exit 0
+        done
+
+        echo "Cluster is not ready after 10 minutes"
+        exit 1
     EOT
 
     interpreter = ["bash", "-c"]
