@@ -105,6 +105,6 @@ variable "kvisor_values" {
 
 variable "wait_for_cluster_ready" {
   type        = bool
-  description = "Wait for cluster to be ready before finishing the module execution"
+  description = "Wait for cluster to be ready before finishing the module execution, this option requires `castai_api_token` to be set"
   default     = false
 }
