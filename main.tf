@@ -107,6 +107,11 @@ resource "helm_release" "castai_agent" {
 
   values = var.agent_values
 
+    set {
+    name  = "replicaCount"
+    value = "2"
+  }
+
   set {
     name  = "provider"
     value = "gke"
