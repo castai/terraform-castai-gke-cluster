@@ -18,6 +18,8 @@ resource "castai_node_configuration" "this" {
   ssh_public_key = try(each.value.ssh_public_key, null)
   image          = try(each.value.image, null)
   tags           = try(each.value.tags, {})
+  init_script    = try(each.value.init_script, null)
+
   gke {
     max_pods_per_node = try(each.value.max_pods_per_node, 110)
     network_tags      = try(each.value.network_tags, null)
