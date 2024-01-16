@@ -2,7 +2,7 @@
     <img src="https://cast.ai/wp-content/themes/cast/img/cast-logo-dark-blue.svg" align="right" height="100" />
 </a>
 
-Terraform module for connecting an GKE cluster to CAST AI
+Terraform module for connecting a GKE cluster to CAST AI
 ==================
 
 
@@ -16,7 +16,7 @@ Requirements
 Using the module
 ------------
 
-A module to connect an GKE cluster to CAST AI.
+A module to connect a GKE cluster to CAST AI.
 
 Requires `castai/castai` and `hashicorp/google` providers to be configured.
 
