@@ -113,6 +113,7 @@ resource "castai_node_template" "this" {
           name = try(dedicated_node_affinity.value.name, null)
           az_name = try(dedicated_node_affinity.value.az_name, null)
           instance_types = try(dedicated_node_affinity.value.instance_types, [])
+          affinity = try(dedicated_node_affinity.value.affinity, [])
         }
       }
     }
