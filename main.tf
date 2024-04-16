@@ -102,8 +102,8 @@ resource "castai_node_template" "this" {
 
         content {
           instance_families = try(custom_priority.value.instance_families, [])
-          spot = try(custom_priority.value.spot, false)
-          on_demand = try(custom_priority.value.on_demand, false)
+          spot              = try(custom_priority.value.spot, false)
+          on_demand         = try(custom_priority.value.on_demand, false)
         }
       }
 
@@ -111,24 +111,24 @@ resource "castai_node_template" "this" {
         for_each = flatten([lookup(constraints.value, "dedicated_node_affinity", [])])
 
         content {
-          name = try(dedicated_node_affinity.value.name, null)
-          az_name = try(dedicated_node_affinity.value.az_name, null)
+          name           = try(dedicated_node_affinity.value.name, null)
+          az_name        = try(dedicated_node_affinity.value.az_name, null)
           instance_types = try(dedicated_node_affinity.value.instance_types, [])
 
           dynamic "affinity" {
             for_each = try(dedicated_node_affinity.value.affinity, {})
-            
+
             content {
-                key = try(affinity.key, null)
-                operator = try(affinity.operator, null)
-                values = try(affinity.values, [])
+              key      = try(affinity.key, null)
+              operator = try(affinity.operator, null)
+              values   = try(affinity.values, [])
             }
           }
         }
       }
     }
   }
-  depends_on = [ castai_autoscaler.castai_autoscaler_policies ]
+  depends_on = [castai_autoscaler.castai_autoscaler_policies]
 }
 
 resource "helm_release" "castai_agent" {
@@ -392,14 +392,16 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
 }
 
 resource "helm_release" "castai_kvisor" {
+  count = var.install_security_agent ? 1 : 0
+
   name             = "castai-kvisor"
   repository       = "https://castai.github.io/helm-charts"
   chart            = "castai-kvisor"
   namespace        = "castai-agent"
   create_namespace = true
   cleanup_on_fail  = true
-  version = var.kvisor_version
-  values = var.kvisor_values
+  version          = var.kvisor_version
+  values           = var.kvisor_values
 
   lifecycle {
     ignore_changes = [version]
@@ -421,27 +423,22 @@ resource "helm_release" "castai_kvisor" {
   }
 
   set {
-    name  = "controller.replicas"
-    value = var.install_security_agent == true ? 1 : 0
-  }
-
-  set {
-    name = "controller.extraArgs.kube-linter-enabled"
+    name  = "controller.extraArgs.kube-linter-enabled"
     value = "true"
   }
 
   set {
-    name = "controller.extraArgs.image-scan-enabled"
+    name  = "controller.extraArgs.image-scan-enabled"
     value = "true"
   }
 
   set {
-    name = "controller.extraArgs.kube-bench-enabled"
+    name  = "controller.extraArgs.kube-bench-enabled"
     value = "true"
   }
 
   set {
-    name = "controller.extraArgs.kube-bench-cloud-provider"
+    name  = "controller.extraArgs.kube-bench-cloud-provider"
     value = "gke"
   }
 }
