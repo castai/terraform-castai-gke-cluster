@@ -663,7 +663,7 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
   autoscaler_policies_json = var.autoscaler_policies_json
 
   dynamic "autoscaler_policy_overrides" {
-    for_each = var.autoscaler_policy_overrides != null ? [var.autoscaler_policy_overrides] : []
+    for_each = try([var.autoscaler_policy_overrides], [])
 
     content {
       enabled                                 = try(autoscaler_policy_overrides.value.enabled, null)
@@ -671,14 +671,14 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
       node_templates_partial_matching_enabled = try(autoscaler_policy_overrides.value.node_templates_partial_matching_enabled, null)
 
       dynamic "unschedulable_pods" {
-        for_each = try(autoscaler_policy_overrides.value.unschedulable_pods, null) != null ? [autoscaler_policy_overrides.value.unschedulable_pods] : []
+        for_each = try([autoscaler_policy_overrides.value.unschedulable_pods], [])
 
         content {
           enabled                  = try(unschedulable_pods.value.enabled, null)
           custom_instances_enabled = try(unschedulable_pods.value.custom_instances_enabled, null)
 
           dynamic "headroom" {
-            for_each = try(unschedulable_pods.value.headroom, null) != null ? [unschedulable_pods.value.headroom] : []
+            for_each = try([unschedulable_pods.value.headroom], [])
 
             content {
               enabled           = try(headroom.value.enabled, null)
@@ -688,7 +688,7 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
           }
 
           dynamic "headroom_spot" {
-            for_each = try(unschedulable_pods.value.headroom_spot, null) != null ? [unschedulable_pods.value.headroom_spot] : []
+            for_each = try([unschedulable_pods.value.headroom_spot], [])
 
             content {
               enabled           = try(headroom_spot.value.enabled, null)
@@ -698,7 +698,7 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
           }
 
           dynamic "node_constraints" {
-            for_each = try(unschedulable_pods.value.node_constraints, null) != null ? [unschedulable_pods.value.node_constraints] : []
+            for_each = try([unschedulable_pods.value.node_constraints], [])
 
             content {
               enabled       = try(node_constraints.value.enabled, null)
@@ -712,14 +712,14 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
       }
 
       dynamic "cluster_limits" {
-        for_each = try(autoscaler_policy_overrides.value.cluster_limits, null) != null ? [autoscaler_policy_overrides.value.cluster_limits] : []
+        for_each = try([autoscaler_policy_overrides.value.cluster_limits], [])
 
         content {
           enabled = try(cluster_limits.value.enabled, null)
 
 
           dynamic "cpu" {
-            for_each = try(cluster_limits.value.cpu, null) != null ? [cluster_limits.value.cpu] : []
+            for_each = try([cluster_limits.value.cpu], [])
 
             content {
               min_cores = try(cpu.value.min_cores, null)
@@ -730,7 +730,7 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
       }
 
       dynamic "spot_instances" {
-        for_each = try(autoscaler_policy_overrides.value.spot_instances, null) != null ? [autoscaler_policy_overrides.value.spot_instances] : []
+        for_each = try([autoscaler_policy_overrides.value.spot_instances], [])
 
         content {
           enabled                             = try(spot_instances.value.enabled, null)
@@ -739,7 +739,7 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
           spot_diversity_price_increase_limit = try(spot_instances.value.spot_diversity_price_increase_limit, null)
 
           dynamic "spot_backups" {
-            for_each = try(spot_instances.value.spot_backups, null) != null ? [spot_instances.value.spot_backups] : []
+            for_each = try([spot_instances.value.spot_backups], [])
 
             content {
               enabled                          = try(spot_backups.value.enabled, null)
@@ -748,7 +748,7 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
           }
 
           dynamic "spot_interruption_predictions" {
-            for_each = try(spot_instances.value.spot_interruption_predictions, null) != null ? [spot_instances.value.spot_interruption_predictions] : []
+            for_each = try([spot_instances.value.spot_interruption_predictions], [])
 
             content {
               enabled                            = try(spot_interruption_predictions.value.enabled, null)
@@ -759,13 +759,13 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
       }
 
       dynamic "node_downscaler" {
-        for_each = try(autoscaler_policy_overrides.value.node_downscaler, null) != null ? [autoscaler_policy_overrides.value.node_downscaler] : []
+        for_each = try([autoscaler_policy_overrides.value.node_downscaler], [])
 
         content {
           enabled = try(node_downscaler.value.enabled, null)
 
           dynamic "empty_nodes" {
-            for_each = try(node_downscaler.value.empty_nodes, null) != null ? [node_downscaler.value.empty_nodes] : []
+            for_each = try([node_downscaler.value.empty_nodes], [])
 
             content {
               enabled       = try(empty_nodes.value.enabled, null)
@@ -774,7 +774,7 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
           }
 
           dynamic "evictor" {
-            for_each = try(node_downscaler.value.evictor, null) != null ? [node_downscaler.value.evictor] : []
+            for_each = try([node_downscaler.value.evictor], [])
 
             content {
               enabled                                = try(evictor.value.enabled, null)
