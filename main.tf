@@ -22,9 +22,9 @@ resource "castai_node_configuration" "this" {
   init_script       = try(each.value.init_script, null)
 
   gke {
-    max_pods_per_node = try(each.value.max_pods_per_node, 110)
-    network_tags      = try(each.value.network_tags, null)
-    disk_type         = try(each.value.disk_type, null)
+    max_pods_per_node               = try(each.value.max_pods_per_node, 110)
+    network_tags                    = try(each.value.network_tags, null)
+    disk_type                       = try(each.value.disk_type, null)
     use_ephemeral_storage_local_ssd = try(each.value.use_ephemeral_storage_local_ssd, null)
   }
 }
