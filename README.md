@@ -91,6 +91,53 @@ module "castai_gke_cluster" {
       custom_instances_with_extended_memory_enabled = true
     }
   }
+
+  autoscaler_policy_overrides = {
+    enabled                                 = true
+    node_templates_partial_matching_enabled = false
+
+    unschedulable_pods = {
+      enabled = true
+
+      headroom = {
+        enabled           = true
+        cpu_percentage    = 10
+        memory_percentage = 10
+      }
+
+      headroom_spot = {
+        enabled           = true
+        cpu_percentage    = 10
+        memory_percentage = 10
+      }
+    }
+
+    node_downscaler = {
+      enabled = true
+
+      empty_nodes = {
+        enabled = true
+      }
+
+      evictor = {
+        aggressive_mode           = false
+        cycle_interval            = "5s10s"
+        dry_run                   = false
+        enabled                   = true
+        node_grace_period_minutes = 10
+        scoped_mode               = false
+      }
+    }
+
+    cluster_limits = {
+      enabled = true
+
+      cpu = {
+        max_cores = 20
+        min_cores = 1
+      }
+    }
+  }
 }
 ```
 
@@ -160,6 +207,89 @@ module "castai-gke-cluster" {
 }
 ```
 
+Migrating from 6.1.x to 6.2.x
+---------------------------
+
+Version 6.2.x changed:
+* Deprecated `autoscaler_policies_json` attribute. Use `autoscaler_policy_overrides` instead.
+
+Old configuration:
+```hcl
+module "castai-gke-cluster" {
+  autoscaler_policies_json = <<-EOT
+    {
+        "enabled": true,
+        "unschedulablePods": {
+            "enabled": true
+        },
+        "nodeDownscaler": {
+            "enabled": true,
+            "emptyNodes": {
+                "enabled": true
+            },
+            "evictor": {
+                "aggressiveMode": false,
+                "cycleInterval": "5m10s",
+                "dryRun": false,
+                "enabled": true,
+                "nodeGracePeriodMinutes": 10,
+                "scopedMode": false
+            }
+        },
+        "nodeTemplatesPartialMatchingEnabled": false,
+        "clusterLimits": {
+            "cpu": {
+                "maxCores": 20,
+                "minCores": 1
+            },
+            "enabled": true
+        }
+    }
+  EOT
+}
+```
+
+New configuration:
+```hcl
+module "castai-gke-cluster" {
+  autoscaler_policy_overrides = {
+    enabled                                 = true
+    node_templates_partial_matching_enabled = false
+
+    unschedulable_pods = {
+      enabled = true
+    }
+
+    node_downscaler = {
+      enabled = true
+
+      empty_nodes = {
+        enabled = true
+      }
+
+      evictor = {
+        aggressive_mode           = false
+        cycle_interval            = "5m10s"
+        dry_run                   = false
+        enabled                   = true
+        node_grace_period_minutes = 10
+        scoped_mode               = false
+      }
+    }
+
+    cluster_limits = {
+      enabled = true
+
+      cpu = {
+        max_cores = 20
+        min_cores = 1
+      }
+    }
+  }
+}
+```
+
+
 # Examples
 
 Usage examples are located in [terraform provider repo](https://github.com/castai/terraform-provider-castai/tree/master/examples/gke)
@@ -170,7 +300,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_castai"></a> [castai](#requirement\_castai) | ~> 7.0.0 |
+| <a name="requirement_castai"></a> [castai](#requirement\_castai) | ~> 7.2.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.0.0 |
 
@@ -178,9 +308,9 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | ~> 7.0.0 |
-| <a name="provider_helm"></a> [helm](#provider\_helm) | >= 2.0.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | n/a |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | 7.2.0 |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | 2.13.2 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.2 |
 
 ## Modules
 
@@ -197,9 +327,14 @@ No modules.
 | [castai_node_template.this](https://registry.terraform.io/providers/castai/castai/latest/docs/resources/node_template) | resource |
 | [helm_release.castai_agent](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_cluster_controller](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.castai_cluster_controller_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_evictor](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.castai_evictor_ext](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.castai_evictor_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_kvisor](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.castai_kvisor_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_pod_pinner](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.castai_pod_pinner_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_spot_handler](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [null_resource.wait_for_cluster](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 
@@ -208,15 +343,21 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_agent_values"></a> [agent\_values](#input\_agent\_values) | List of YAML formatted string values for agent helm chart | `list(string)` | `[]` | no |
+| <a name="input_agent_version"></a> [agent\_version](#input\_agent\_version) | Version of castai-agent helm chart. Default latest | `string` | `null` | no |
 | <a name="input_api_grpc_addr"></a> [api\_grpc\_addr](#input\_api\_grpc\_addr) | CAST AI GRPC API address | `string` | `"api-grpc.cast.ai:443"` | no |
 | <a name="input_api_url"></a> [api\_url](#input\_api\_url) | URL of alternative CAST AI API to be used during development or testing | `string` | `"https://api.cast.ai"` | no |
-| <a name="input_autoscaler_policies_json"></a> [autoscaler\_policies\_json](#input\_autoscaler\_policies\_json) | Optional json object to override CAST AI cluster autoscaler policies | `string` | `null` | no |
+| <a name="input_autoscaler_policies_json"></a> [autoscaler\_policies\_json](#input\_autoscaler\_policies\_json) | Optional json object to override CAST AI cluster autoscaler policies. Deprecated, use `autoscaler_policy_overrides` instead. | `string` | `null` | no |
+| <a name="input_autoscaler_policy_overrides"></a> [autoscaler\_policy\_overrides](#input\_autoscaler\_policy\_overrides) | Optional Autoscaler policy definitions to override current autoscaler settings | `any` | `null` | no |
 | <a name="input_castai_api_token"></a> [castai\_api\_token](#input\_castai\_api\_token) | Optional CAST AI API token created in console.cast.ai API Access keys section. Used only when `wait_for_cluster_ready` is set to true | `string` | `""` | no |
 | <a name="input_castai_components_labels"></a> [castai\_components\_labels](#input\_castai\_components\_labels) | Optional additional Kubernetes labels for CAST AI pods | `map(any)` | `{}` | no |
 | <a name="input_cluster_controller_values"></a> [cluster\_controller\_values](#input\_cluster\_controller\_values) | List of YAML formatted string values for cluster-controller helm chart | `list(string)` | `[]` | no |
+| <a name="input_cluster_controller_version"></a> [cluster\_controller\_version](#input\_cluster\_controller\_version) | Version of castai-cluster-controller helm chart. Default latest | `string` | `null` | no |
 | <a name="input_default_node_configuration"></a> [default\_node\_configuration](#input\_default\_node\_configuration) | ID of the default node configuration | `string` | n/a | yes |
 | <a name="input_delete_nodes_on_disconnect"></a> [delete\_nodes\_on\_disconnect](#input\_delete\_nodes\_on\_disconnect) | Optionally delete Cast AI created nodes when the cluster is destroyed | `bool` | `false` | no |
+| <a name="input_evictor_ext_values"></a> [evictor\_ext\_values](#input\_evictor\_ext\_values) | List of YAML formatted string with evictor-ext values | `list(string)` | `[]` | no |
+| <a name="input_evictor_ext_version"></a> [evictor\_ext\_version](#input\_evictor\_ext\_version) | Version of castai-evictor-ext chart. Default latest | `string` | `null` | no |
 | <a name="input_evictor_values"></a> [evictor\_values](#input\_evictor\_values) | List of YAML formatted string values for evictor helm chart | `list(string)` | `[]` | no |
+| <a name="input_evictor_version"></a> [evictor\_version](#input\_evictor\_version) | Version of castai-evictor chart. Default latest | `string` | `null` | no |
 | <a name="input_gke_cluster_location"></a> [gke\_cluster\_location](#input\_gke\_cluster\_location) | Location of the cluster to be connected to CAST AI. Can be region or zone for zonal clusters | `string` | n/a | yes |
 | <a name="input_gke_cluster_name"></a> [gke\_cluster\_name](#input\_gke\_cluster\_name) | Name of the cluster to be connected to CAST AI. | `string` | n/a | yes |
 | <a name="input_gke_credentials"></a> [gke\_credentials](#input\_gke\_credentials) | Optional GCP Service account credentials.json | `string` | n/a | yes |
@@ -226,8 +367,11 @@ No modules.
 | <a name="input_kvisor_version"></a> [kvisor\_version](#input\_kvisor\_version) | Version of kvisor chart. If not provided, latest version will be used. | `string` | `null` | no |
 | <a name="input_node_configurations"></a> [node\_configurations](#input\_node\_configurations) | Map of GKE node configurations to create | `any` | `{}` | no |
 | <a name="input_node_templates"></a> [node\_templates](#input\_node\_templates) | Map of node templates to create | `any` | `{}` | no |
+| <a name="input_pod_pinner_version"></a> [pod\_pinner\_version](#input\_pod\_pinner\_version) | Version of pod-pinner helm chart. Default latest | `string` | `null` | no |
 | <a name="input_project_id"></a> [project\_id](#input\_project\_id) | The project id from GCP | `string` | n/a | yes |
+| <a name="input_self_managed"></a> [self\_managed](#input\_self\_managed) | Whether CAST AI components' upgrades are managed by a customer; by default upgrades are managed CAST AI central system. | `bool` | `false` | no |
 | <a name="input_spot_handler_values"></a> [spot\_handler\_values](#input\_spot\_handler\_values) | List of YAML formatted string values for spot-handler helm chart | `list(string)` | `[]` | no |
+| <a name="input_spot_handler_version"></a> [spot\_handler\_version](#input\_spot\_handler\_version) | Version of castai-spot-handler helm chart. Default latest | `string` | `null` | no |
 | <a name="input_wait_for_cluster_ready"></a> [wait\_for\_cluster\_ready](#input\_wait\_for\_cluster\_ready) | Wait for cluster to be ready before finishing the module execution, this option requires `castai_api_token` to be set | `bool` | `false` | no |
 
 ## Outputs
