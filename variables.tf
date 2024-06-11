@@ -35,7 +35,13 @@ variable "gke_cluster_name" {
 
 variable "autoscaler_policies_json" {
   type        = string
-  description = "Optional json object to override CAST AI cluster autoscaler policies"
+  description = "Optional json object to override CAST AI cluster autoscaler policies. Deprecated, use `autoscaler_settings` instead."
+  default     = null
+}
+
+variable "autoscaler_settings" {
+  type        = any
+  description = "Optional Autoscaler policy definitions to override current autoscaler settings"
   default     = null
 }
 
