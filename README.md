@@ -373,6 +373,10 @@ No modules.
 | <a name="input_spot_handler_values"></a> [spot\_handler\_values](#input\_spot\_handler\_values) | List of YAML formatted string values for spot-handler helm chart | `list(string)` | `[]` | no |
 | <a name="input_spot_handler_version"></a> [spot\_handler\_version](#input\_spot\_handler\_version) | Version of castai-spot-handler helm chart. Default latest | `string` | `null` | no |
 | <a name="input_wait_for_cluster_ready"></a> [wait\_for\_cluster\_ready](#input\_wait\_for\_cluster\_ready) | Wait for cluster to be ready before finishing the module execution, this option requires `castai_api_token` to be set | `bool` | `false` | no |
+| <a name="install_workload_autoscaler"></a> [install\_workload\_autoscaler](#install\_workload\_autoscaler) | Optional flag for installation of workload autoscaler (https://docs.cast.ai/docs/workload-autoscaling-configuration) | `bool` | `false` | no |
+| <a name="workload_autoscaler_version"></a> [workload\_autoscaler\_version](#workload\_autoscaler\_version) | Version of castai-workload-autoscaler helm chart. Default latest | `string` | `null` | no |
+| <a name="workload_autoscaler_values"></a> [workload\_autoscaler\_values](#workload\_autoscaler\_values) | List of YAML formatted strings with cluster-workload-autoscaler values | `list(string)` | `[]` | no |
+
 
 ## Outputs
 
