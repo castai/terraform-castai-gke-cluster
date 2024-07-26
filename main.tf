@@ -82,7 +82,6 @@ resource "castai_node_template" "this" {
       max_memory                                  = try(constraints.value.max_memory, null)
       architectures                               = try(constraints.value.architectures, ["amd64"])
       azs                                         = try(constraints.value.azs, null)
-      os                                          = try(constraints.value.os, ["linux"])
       burstable_instances                         = try(constraints.value.burstable_instances, null)
 
       dynamic "instance_families" {
