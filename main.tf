@@ -83,6 +83,7 @@ resource "castai_node_template" "this" {
       architectures                               = try(constraints.value.architectures, ["amd64"])
       azs                                         = try(constraints.value.azs, null)
       burstable_instances                         = try(constraints.value.burstable_instances, null)
+      customer_specific                           = try(constraints.value.customer_specific, null)
 
       dynamic "instance_families" {
         for_each = [for instance_families in flatten([lookup(constraints.value, "instance_families", [])]) : instance_families if instance_families != null]
