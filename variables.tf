@@ -87,6 +87,13 @@ variable "node_configurations" {
 variable "default_node_configuration" {
   type        = string
   description = "ID of the default node configuration"
+  default = ""
+}
+
+variable "default_node_configuration_name" {
+    type        = string
+    description = "Name of the default node configuration"
+    default = ""
 }
 
 variable "node_templates" {
