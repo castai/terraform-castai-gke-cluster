@@ -175,7 +175,7 @@ resource "helm_release" "castai_agent" {
 
   set {
     name  = "replicaCount"
-    value = "1"
+    value = "2"
   }
 
   set {
