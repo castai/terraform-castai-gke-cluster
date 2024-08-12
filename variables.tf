@@ -95,6 +95,12 @@ variable "node_templates" {
   default     = {}
 }
 
+variable "workload_scaling_policies" {
+  type        = any
+  description = "Map of workload scaling policies to create"
+  default     = {}
+}
+
 variable "install_security_agent" {
   type        = bool
   default     = false

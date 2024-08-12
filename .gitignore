@@ -12,5 +12,6 @@ examples/**/*.tfstate.backup
 examples/**/.terraform.lock.hcl
 examples/**/*.tfvars
 examples/**/.kube/*
+examples/*
 terraform.tfstate
 .terraform*
