@@ -31,7 +31,7 @@ resource "castai_node_configuration" "this" {
 
 resource "castai_node_configuration_default" "this" {
   cluster_id       = castai_gke_cluster.castai_cluster.id
-  configuration_id = var.default_node_configuration
+  configuration_id = var.default_node_configuration_name != "" ? castai_node_configuration.this[var.default_node_configuration_name].id : var.default_node_configuration
 }
 
 resource "castai_node_template" "this" {
@@ -40,7 +40,7 @@ resource "castai_node_template" "this" {
   cluster_id = castai_gke_cluster.castai_cluster.id
 
   name                                          = try(each.value.name, each.key)
-  configuration_id                              = try(each.value.configuration_id, null)
+  configuration_id                              = try(each.value.configuration_name, null) != null ? castai_node_configuration.this[each.value.configuration_name].id : try(each.value.configuration_id, null)
   is_default                                    = try(each.value.is_default, false)
   is_enabled                                    = try(each.value.is_enabled, true)
   should_taint                                  = try(each.value.should_taint, true)
