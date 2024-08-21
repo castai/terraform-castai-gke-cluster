@@ -125,12 +125,12 @@ resource "castai_node_template" "this" {
           instance_types = try(dedicated_node_affinity.value.instance_types, [])
 
           dynamic "affinity" {
-            for_each = try(dedicated_node_affinity.value.affinity, {})
+            for_each = flatten([lookup(dedicated_node_affinity.value, "affinity", [])])
 
             content {
-              key      = try(affinity.key, null)
-              operator = try(affinity.operator, null)
-              values   = try(affinity.values, [])
+              key      = try(affinity.value.key, null)
+              operator = try(affinity.value.operator, null)
+              values   = try(affinity.value.values, [])
             }
           }
         }
