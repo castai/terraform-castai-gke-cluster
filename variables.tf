@@ -144,6 +144,12 @@ variable "pod_pinner_version" {
   default     = null
 }
 
+variable "pod_pinner_ext_version" {
+  description = "Version of castai-pod-pinner-ext chart. Default latest"
+  type        = string
+  default     = null
+}
+
 variable "spot_handler_version" {
   description = "Version of castai-spot-handler helm chart. Default latest"
   type        = string
@@ -188,6 +194,12 @@ variable "evictor_ext_values" {
 
 variable "pod_pinner_values" {
   description = "List of YAML formatted string values for agent helm chart"
+  type        = list(string)
+  default     = []
+}
+
+variable "pod_pinner_ext_values" {
+  description = "List of YAML formatted string with pod-pinner-ext values"
   type        = list(string)
   default     = []
 }
