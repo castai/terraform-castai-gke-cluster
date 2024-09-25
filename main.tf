@@ -468,15 +468,10 @@ resource "helm_release" "castai_pod_pinner" {
     value = "0"
   }
 
-  set {
-    name  = "castai-pod-pinner-ext.enabled"
-    value = "false"
-  }
-
   depends_on = [helm_release.castai_agent]
 
   lifecycle {
-    ignore_changes = [set, version]
+    ignore_changes = [version]
   }
 }
 
@@ -497,11 +492,6 @@ resource "helm_release" "castai_pod_pinner_self_managed" {
   set {
     name  = "castai.clusterID"
     value = castai_gke_cluster.castai_cluster.id
-  }
-
-  set {
-    name  = "castai-pod-pinner-ext.enabled"
-    value = "false"
   }
 
   dynamic "set" {
@@ -534,21 +524,6 @@ resource "helm_release" "castai_pod_pinner_self_managed" {
   }
 
   depends_on = [helm_release.castai_agent]
-}
-
-resource "helm_release" "castai_pod_pinner_ext" {
-  name             = "castai-pod-pinner-ext"
-  repository       = "https://castai.github.io/helm-charts"
-  chart            = "castai-pod-pinner-ext"
-  namespace        = "castai-agent"
-  create_namespace = false
-  cleanup_on_fail  = true
-  wait             = true
-
-  version = var.pod_pinner_ext_version
-  values  = var.pod_pinner_ext_values
-
-  depends_on = [helm_release.castai_pod_pinner]
 }
 
 resource "helm_release" "castai_spot_handler" {
