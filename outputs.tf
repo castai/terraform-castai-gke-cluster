@@ -17,3 +17,8 @@ output "castai_node_templates" {
     for k, v in castai_node_template.this : v.name => v.name
   }
 }
+
+output "castai_service_account" {
+  description = "Service account used by CAST AI to manage the cluster"
+  value       = castai_gke_cluster.castai_cluster.cast_service_account
+}

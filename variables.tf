@@ -227,3 +227,9 @@ variable "workload_autoscaler_values" {
   type        = list(string)
   default     = []
 }
+
+variable "client_service_account_email" {
+    description = "Email of the service account used to impersonate the client"
+    type        = string
+    default     = ""
+}
