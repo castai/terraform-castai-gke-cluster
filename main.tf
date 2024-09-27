@@ -4,6 +4,8 @@ resource "castai_gke_cluster" "castai_cluster" {
   name                       = var.gke_cluster_name
   delete_nodes_on_disconnect = var.delete_nodes_on_disconnect
   credentials_json           = var.gke_credentials
+  client_service_account     = var.client_service_account_email
+  cast_service_account       = "to-be-computed"
 }
 
 resource "castai_node_configuration" "this" {
@@ -144,8 +146,8 @@ resource "castai_node_template" "this" {
 resource "castai_workload_scaling_policy" "this" {
   for_each = { for k, v in var.workload_scaling_policies : k => v }
 
-  name              = try(each.value.name, each.key)
-  cluster_id        = castai_gke_cluster.castai_cluster.id
+  name       = try(each.value.name, each.key)
+  cluster_id = castai_gke_cluster.castai_cluster.id
 
   apply_type        = try(each.value.apply_type, "DEFERRED")
   management_option = try(each.value.management_option, "READ_ONLY")
