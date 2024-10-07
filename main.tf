@@ -81,6 +81,7 @@ resource "castai_node_template" "this" {
       min_memory                                  = try(constraints.value.min_memory, null)
       max_memory                                  = try(constraints.value.max_memory, null)
       architectures                               = try(constraints.value.architectures, ["amd64"])
+      architecture_priority                       = try(constraints.value.architecture_priority, [])
       azs                                         = try(constraints.value.azs, null)
       burstable_instances                         = try(constraints.value.burstable_instances, null)
       customer_specific                           = try(constraints.value.customer_specific, null)
