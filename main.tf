@@ -145,8 +145,8 @@ resource "castai_node_template" "this" {
 resource "castai_workload_scaling_policy" "this" {
   for_each = { for k, v in var.workload_scaling_policies : k => v }
 
-  name              = try(each.value.name, each.key)
-  cluster_id        = castai_gke_cluster.castai_cluster.id
+  name       = try(each.value.name, each.key)
+  cluster_id = castai_gke_cluster.castai_cluster.id
 
   apply_type        = try(each.value.apply_type, "DEFERRED")
   management_option = try(each.value.management_option, "READ_ONLY")
@@ -616,6 +616,36 @@ resource "helm_release" "castai_kvisor" {
   set {
     name  = "controller.extraArgs.kube-bench-cloud-provider"
     value = "gke"
+  }
+}
+
+resource "helm_release" "castai_cloud_proxy" {
+  count = var.install_cloud_proxy ? 1 : 0
+
+  name             = "castai-cloud-proxy"
+  repository       = "https://castai.github.io/helm-charts"
+  chart            = "castai-cloud-proxy"
+  version          = var.cloud_proxy_version
+  namespace        = "castai-agent"
+  create_namespace = true
+  cleanup_on_fail  = true
+  wait             = true
+
+  values = var.cloud_proxy_values
+
+  set {
+    name  = "castai.clusterID"
+    value = castai_gke_cluster.castai_cluster.id
+  }
+
+  set_sensitive {
+    name  = "castai.apiKey"
+    value = castai_gke_cluster.castai_cluster.cluster_token
+  }
+
+  set {
+    name  = "castai.grpcURL"
+    value = coalesce(var.cloud_proxy_grpc_url_override, var.grpc_url)
   }
 }
 
