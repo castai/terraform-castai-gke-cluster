@@ -229,13 +229,13 @@ variable "workload_autoscaler_values" {
 }
 
 variable "install_cloud_proxy" {
-  description = "Optional flag for installation of cloud-proxy"
+  description = "Optional flag for installation of castai-cloud-proxy"
   type        = bool
   default     = false
 }
 
 variable "cloud_proxy_version" {
-  description = "Version of the castai-cloud-proxy Helm chart. Default latest"
+  description = "Version of the castai-cloud-proxy Helm chart. Defaults to latest."
   type        = string
   default     = null
 }
