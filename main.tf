@@ -1,3 +1,7 @@
+locals {
+  read_only_mode = nonsensitive(var.gke_credentials == null)
+}
+
 resource "castai_gke_cluster" "castai_cluster" {
   project_id                 = var.project_id
   location                   = var.gke_cluster_location
@@ -7,7 +11,7 @@ resource "castai_gke_cluster" "castai_cluster" {
 }
 
 resource "castai_node_configuration" "this" {
-  for_each = { for k, v in var.node_configurations : k => v }
+  for_each = local.read_only_mode ? {} : { for k, v in var.node_configurations : k => v }
 
   cluster_id = castai_gke_cluster.castai_cluster.id
 
@@ -30,12 +34,13 @@ resource "castai_node_configuration" "this" {
 }
 
 resource "castai_node_configuration_default" "this" {
+  count            = local.read_only_mode ? 0 : 1
   cluster_id       = castai_gke_cluster.castai_cluster.id
   configuration_id = var.default_node_configuration_name != "" ? castai_node_configuration.this[var.default_node_configuration_name].id : var.default_node_configuration
 }
 
 resource "castai_node_template" "this" {
-  for_each = { for k, v in var.node_templates : k => v }
+  for_each = local.read_only_mode ? {} : { for k, v in var.node_templates : k => v }
 
   cluster_id = castai_gke_cluster.castai_cluster.id
 
@@ -143,7 +148,7 @@ resource "castai_node_template" "this" {
 }
 
 resource "castai_workload_scaling_policy" "this" {
-  for_each = { for k, v in var.workload_scaling_policies : k => v }
+  for_each = local.read_only_mode ? {} : { for k, v in var.workload_scaling_policies : k => v }
 
   name       = try(each.value.name, each.key)
   cluster_id = castai_gke_cluster.castai_cluster.id
@@ -218,7 +223,7 @@ resource "helm_release" "castai_agent" {
 }
 
 resource "helm_release" "castai_cluster_controller" {
-  count = var.self_managed ? 0 : 1
+  count = !local.read_only_mode && !var.self_managed ? 1 : 0
 
   name             = "cluster-controller"
   repository       = "https://castai.github.io/helm-charts"
@@ -265,7 +270,7 @@ resource "helm_release" "castai_cluster_controller" {
 }
 
 resource "helm_release" "castai_cluster_controller_self_managed" {
-  count = var.self_managed ? 1 : 0
+  count = !local.read_only_mode && var.self_managed ? 1 : 0
 
   name             = "cluster-controller"
   repository       = "https://castai.github.io/helm-charts"
@@ -311,6 +316,10 @@ resource "null_resource" "wait_for_cluster" {
   count      = var.wait_for_cluster_ready ? 1 : 0
   depends_on = [helm_release.castai_cluster_controller, helm_release.castai_agent]
 
+  triggers = {
+    credentials = var.gke_credentials,
+  }
+
   provisioner "local-exec" {
     environment = {
       API_KEY = var.castai_api_token
@@ -333,7 +342,7 @@ resource "null_resource" "wait_for_cluster" {
 }
 
 resource "helm_release" "castai_evictor" {
-  count = var.self_managed ? 0 : 1
+  count = !local.read_only_mode && !var.self_managed ? 1 : 0
 
   name             = "castai-evictor"
   repository       = "https://castai.github.io/helm-charts"
@@ -372,7 +381,7 @@ resource "helm_release" "castai_evictor" {
 }
 
 resource "helm_release" "castai_evictor_self_managed" {
-  count = var.self_managed ? 1 : 0
+  count = !local.read_only_mode && var.self_managed ? 1 : 0
 
   name             = "castai-evictor"
   repository       = "https://castai.github.io/helm-charts"
@@ -402,6 +411,7 @@ resource "helm_release" "castai_evictor_self_managed" {
 }
 
 resource "helm_release" "castai_evictor_ext" {
+  count            = !local.read_only_mode ? 1 : 0
   name             = "castai-evictor-ext"
   repository       = "https://castai.github.io/helm-charts"
   chart            = "castai-evictor-ext"
@@ -417,7 +427,7 @@ resource "helm_release" "castai_evictor_ext" {
 }
 
 resource "helm_release" "castai_pod_pinner" {
-  count = var.self_managed ? 0 : 1
+  count = !local.read_only_mode && !var.self_managed ? 1 : 0
 
   name             = "castai-pod-pinner"
   repository       = "https://castai.github.io/helm-charts"
@@ -477,7 +487,7 @@ resource "helm_release" "castai_pod_pinner" {
 }
 
 resource "helm_release" "castai_pod_pinner_self_managed" {
-  count = var.self_managed ? 1 : 0
+  count = !local.read_only_mode && var.self_managed ? 1 : 0
 
   name             = "castai-pod-pinner"
   repository       = "https://castai.github.io/helm-charts"
@@ -528,6 +538,7 @@ resource "helm_release" "castai_pod_pinner_self_managed" {
 }
 
 resource "helm_release" "castai_spot_handler" {
+  count            = !local.read_only_mode ? 1 : 0
   name             = "castai-spot-handler"
   repository       = "https://castai.github.io/helm-charts"
   chart            = "castai-spot-handler"
@@ -619,36 +630,6 @@ resource "helm_release" "castai_kvisor" {
   }
 }
 
-resource "helm_release" "castai_cloud_proxy" {
-  count = var.install_cloud_proxy ? 1 : 0
-
-  name             = "castai-cloud-proxy"
-  repository       = "https://castai.github.io/helm-charts"
-  chart            = "castai-cloud-proxy"
-  version          = var.cloud_proxy_version
-  namespace        = "castai-agent"
-  create_namespace = true
-  cleanup_on_fail  = true
-  wait             = true
-
-  values = var.cloud_proxy_values
-
-  set {
-    name  = "castai.clusterID"
-    value = castai_gke_cluster.castai_cluster.id
-  }
-
-  set_sensitive {
-    name  = "castai.apiKey"
-    value = castai_gke_cluster.castai_cluster.cluster_token
-  }
-
-  set {
-    name  = "castai.grpcURL"
-    value = coalesce(var.cloud_proxy_grpc_url_override, var.grpc_url)
-  }
-}
-
 resource "helm_release" "castai_kvisor_self_managed" {
   count = var.install_security_agent && var.self_managed ? 1 : 0
 
@@ -688,6 +669,36 @@ resource "helm_release" "castai_kvisor_self_managed" {
   set {
     name  = "controller.extraArgs.kube-bench-cloud-provider"
     value = "gke"
+  }
+}
+
+resource "helm_release" "castai_cloud_proxy" {
+  count = var.install_cloud_proxy ? 1 : 0
+
+  name             = "castai-cloud-proxy"
+  repository       = "https://castai.github.io/helm-charts"
+  chart            = "castai-cloud-proxy"
+  version          = var.cloud_proxy_version
+  namespace        = "castai-agent"
+  create_namespace = true
+  cleanup_on_fail  = true
+  wait             = true
+
+  values = var.cloud_proxy_values
+
+  set {
+    name  = "castai.clusterID"
+    value = castai_gke_cluster.castai_cluster.id
+  }
+
+  set_sensitive {
+    name  = "castai.apiKey"
+    value = castai_gke_cluster.castai_cluster.cluster_token
+  }
+
+  set {
+    name  = "castai.grpcURL"
+    value = coalesce(var.cloud_proxy_grpc_url_override, var.grpc_url)
   }
 }
 
@@ -754,6 +765,8 @@ resource "helm_release" "castai_workload_autoscaler_self_managed" {
 
 
 resource "castai_autoscaler" "castai_autoscaler_policies" {
+  count = !local.read_only_mode ? 1 : 0
+
   cluster_id = castai_gke_cluster.castai_cluster.id
 
   autoscaler_policies_json = var.autoscaler_policies_json

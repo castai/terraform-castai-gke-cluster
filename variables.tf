@@ -64,12 +64,12 @@ variable "delete_nodes_on_disconnect" {
 variable "gke_cluster_location" {
   type        = string
   description = "Location of the cluster to be connected to CAST AI. Can be region or zone for zonal clusters"
-
 }
 
 variable "gke_credentials" {
   type        = string
-  description = "Optional GCP Service account credentials.json"
+  description = "Optional GCP Service account credentials.json. Set to `null` to connect in read-only mode"
+  sensitive   = true
 }
 
 variable "castai_components_labels" {
