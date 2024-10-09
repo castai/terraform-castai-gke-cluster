@@ -5,10 +5,10 @@ variable "api_url" {
 }
 
 variable "castai_api_token" {
-  type = string
+  type        = string
   description = "Optional CAST AI API token created in console.cast.ai API Access keys section. Used only when `wait_for_cluster_ready` is set to true"
-  sensitive = true
-  default = ""
+  sensitive   = true
+  default     = ""
 }
 
 variable "grpc_url" {
@@ -27,9 +27,9 @@ variable "kvisor_controller_extra_args" {
   type        = map(string)
   description = "Extra arguments for the kvisor controller. Optionally enable kvisor to lint Kubernetes YAML manifests, scan workload images and check if workloads pass CIS Kubernetes Benchmarks as well as NSA, WASP and PCI recommendations."
   default = {
-    "kube-linter-enabled"        = "true"
-    "image-scan-enabled"         = "true"
-    "kube-bench-enabled"         = "true"
+    "kube-linter-enabled" = "true"
+    "image-scan-enabled"  = "true"
+    "kube-bench-enabled"  = "true"
   }
 }
 
@@ -87,13 +87,13 @@ variable "node_configurations" {
 variable "default_node_configuration" {
   type        = string
   description = "ID of the default node configuration"
-  default = ""
+  default     = ""
 }
 
 variable "default_node_configuration_name" {
-    type        = string
-    description = "Name of the default node configuration"
-    default = ""
+  type        = string
+  description = "Name of the default node configuration"
+  default     = ""
 }
 
 variable "node_templates" {
@@ -226,4 +226,28 @@ variable "workload_autoscaler_values" {
   description = "List of YAML formatted string with cluster-workload-autoscaler values"
   type        = list(string)
   default     = []
+}
+
+variable "install_cloud_proxy" {
+  description = "Optional flag for installation of castai-cloud-proxy"
+  type        = bool
+  default     = false
+}
+
+variable "cloud_proxy_version" {
+  description = "Version of the castai-cloud-proxy Helm chart. Defaults to latest."
+  type        = string
+  default     = null
+}
+
+variable "cloud_proxy_values" {
+  description = "List of YAML formatted strings with castai-cloud-proxy values"
+  type        = list(string)
+  default     = []
+}
+
+variable "cloud_proxy_grpc_url_override" {
+  description = "Override for the castai-cloud-proxy gRPC URL"
+  type        = string
+  default     = null
 }
