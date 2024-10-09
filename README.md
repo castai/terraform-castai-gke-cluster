@@ -303,6 +303,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="requirement_castai"></a> [castai](#requirement\_castai) | ~> 7.17 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.0.0 |
+| <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.0.0 |
 
 ## Providers
 
@@ -310,7 +311,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 |------|---------|
 | <a name="provider_castai"></a> [castai](#provider\_castai) | ~> 7.17 |
 | <a name="provider_helm"></a> [helm](#provider\_helm) | >= 2.0.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | n/a |
+| <a name="provider_null"></a> [null](#provider\_null) | >= 3.0.0 |
 
 ## Modules
 
