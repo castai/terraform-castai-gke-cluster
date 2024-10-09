@@ -31,7 +31,7 @@ resource "castai_gke_cluster" "castai_cluster" {
 }
 
 resource "castai_node_configuration" "this" {
-  for_each = local.read_only_mode ? {} : { for k, v in var.node_configurations : k => v }
+  for_each = local.read_only_mode ? tomap({}) : { for k, v in var.node_configurations : k => v }
 
   cluster_id = castai_gke_cluster.castai_cluster.id
 
@@ -60,7 +60,7 @@ resource "castai_node_configuration_default" "this" {
 }
 
 resource "castai_node_template" "this" {
-  for_each = local.read_only_mode ? {} : { for k, v in var.node_templates : k => v }
+  for_each = local.read_only_mode ? tomap({}) : { for k, v in var.node_templates : k => v }
 
   cluster_id = castai_gke_cluster.castai_cluster.id
 
