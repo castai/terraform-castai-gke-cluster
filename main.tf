@@ -2,6 +2,26 @@ locals {
   read_only_mode = nonsensitive(var.gke_credentials == null)
 }
 
+moved {
+  from = castai_node_configuration_default.this
+  to   = castai_node_configuration_default.this[0]
+}
+
+moved {
+  from = helm_release.castai_evictor_ext
+  to   = helm_release.castai_evictor_ext[0]
+}
+
+moved {
+  from = helm_release.castai_spot_handler
+  to   = helm_release.castai_spot_handler[0]
+}
+
+moved {
+  from = castai_autoscaler.castai_autoscaler_policies
+  to   = castai_autoscaler.castai_autoscaler_policies[0]
+}
+
 resource "castai_gke_cluster" "castai_cluster" {
   project_id                 = var.project_id
   location                   = var.gke_cluster_location
