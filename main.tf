@@ -26,6 +26,26 @@ resource "castai_node_configuration" "this" {
     network_tags                    = try(each.value.network_tags, null)
     disk_type                       = try(each.value.disk_type, null)
     use_ephemeral_storage_local_ssd = try(each.value.use_ephemeral_storage_local_ssd, null)
+    dynamic "loadbalancers" {
+      for_each = flatten([lookup(each.value, "loadbalancers", [])])
+      content {
+        dynamic "target_backend_pools" {
+          for_each = flatten([lookup(loadbalancers.value, "target_backend_pools", [])])
+
+          content {
+            name = try(ip_based_backend_pools.value.name, null)
+          }
+        }
+        dynamic "unmanaged_instance_groups" {
+          for_each = flatten([lookup(loadbalancers.value, "unmanaged_instance_groups", [])])
+
+          content {
+            name = try(unmanaged_instance_groups.value.name, null)
+            zone = try(unmanaged_instance_groups.value.zone, null)
+          }
+        }
+      }
+    }
   }
 }
 
