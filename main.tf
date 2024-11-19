@@ -33,7 +33,7 @@ resource "castai_node_configuration" "this" {
           for_each = flatten([lookup(loadbalancers.value, "target_backend_pools", [])])
 
           content {
-            name = try(ip_based_backend_pools.value.name, null)
+            name = try(target_backend_pools.value.name, null)
           }
         }
         dynamic "unmanaged_instance_groups" {
