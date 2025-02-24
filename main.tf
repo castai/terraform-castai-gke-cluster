@@ -26,6 +26,12 @@ resource "castai_node_configuration" "this" {
     network_tags                    = try(each.value.network_tags, null)
     disk_type                       = try(each.value.disk_type, null)
     use_ephemeral_storage_local_ssd = try(each.value.use_ephemeral_storage_local_ssd, null)
+    dynamic "secondary_ip_range" {
+      for_each = lookup(each.value, "secondary_ip_range", null) != null ? [each.value.secondary_ip_range] : []
+      content {
+        range_name = secondary_ip_range.value.range_name
+      }
+    }
     dynamic "loadbalancers" {
       for_each = flatten([lookup(each.value, "loadbalancers", [])])
       content {
