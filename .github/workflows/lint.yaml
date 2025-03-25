@@ -14,17 +14,17 @@ jobs:
         os: [ubuntu-latest]
 
     steps:
-    - uses: actions/checkout@v2
-      name: Checkout source code
+    - name: Checkout source code
+      uses: actions/checkout@v3  # Updated to v3
 
-    - uses: actions/cache@v2
-      name: Cache plugin dir
+    - name: Cache plugin dir
+      uses: actions/cache@v3  # Updated to v3 (or use v4)
       with:
         path: ~/.tflint.d/plugins
         key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
 
-    - uses: terraform-linters/setup-tflint@v1
-      name: Setup TFLint
+    - name: Setup TFLint
+      uses: terraform-linters/setup-tflint@v1
       with:
         tflint_version: v0.29.0
 
