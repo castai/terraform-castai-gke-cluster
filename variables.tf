@@ -251,3 +251,15 @@ variable "cloud_proxy_grpc_url_override" {
   type        = string
   default     = null
 }
+
+variable "pod_mutator_version" {
+  description = "Version of castai-pod-mutator helm chart. Default latest"
+  type        = string
+  default     = null
+}
+
+variable "organization_id" {
+  description = "CAST AI Organization ID"
+  type        = string
+  default     = ""
+}
