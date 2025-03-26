@@ -344,6 +344,8 @@ resource "helm_release" "castai_cluster_controller_self_managed" {
 
 # Helm Release for CAST AI Pod Mutator
 resource "helm_release" "castai_pod_mutator" {
+  count = var.install_pod_mutator && !var.self_managed ? 1 : 0
+
   name             = "castai-pod-mutator"
   repository       = "https://castai.github.io/helm-charts"
   chart            = "castai-pod-mutator"
@@ -354,14 +356,17 @@ resource "helm_release" "castai_pod_mutator" {
 
   version = var.pod_mutator_version
 
-  set {
-    name  = "castai.configMapRef"
-    value = "castai-cluster-controller"
+  dynamic "set" {
+    for_each = var.api_url != "" ? [var.api_url] : []
+    content {
+      name  = "castai.apiURL"
+      value = var.api_url
+    }
   }
 
-  set {
+  set_sensitive {
     name  = "castai.apiKey"
-    value = castai_gke_cluster.castai_cluster.cluster_token
+    value = castai_gke_cluster.my_castai_cluster.cluster_token
   }
 
   set {
@@ -371,10 +376,10 @@ resource "helm_release" "castai_pod_mutator" {
 
   set {
     name  = "castai.clusterID"
-    value = castai_gke_cluster.castai_cluster.id
+    value = castai_gke_cluster.my_castai_cluster.id
   }
 
-  depends_on = [helm_release.castai_agent]
+  depends_on = [helm_release.castai_agent, helm_release.castai_cluster_controller]
 }
 
 resource "null_resource" "wait_for_cluster" {
