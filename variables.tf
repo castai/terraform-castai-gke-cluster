@@ -251,3 +251,21 @@ variable "cloud_proxy_grpc_url_override" {
   type        = string
   default     = null
 }
+
+variable "install_pod_mutator" {
+  description = "Optional flag for installation of pod mutator"
+  type        = bool
+  default     = false
+}
+
+variable "pod_mutator_version" {
+  description = "Version of castai-pod-mutator helm chart. Default latest"
+  type        = string
+  default     = null
+}
+
+variable "pod_mutator_values" {
+  description = "List of YAML formatted string values for pod-mutator helm chart"
+  type        = list(string)
+  default     = []
+}
