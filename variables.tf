@@ -216,6 +216,12 @@ variable "install_workload_autoscaler" {
   description = "Optional flag for installation of workload autoscaler (https://docs.cast.ai/docs/workload-autoscaling-configuration)"
 }
 
+variable "install_pod_mutator" {
+  type        = bool
+  default     = false
+  description = "Optional flag for installation of pod mutator"
+}
+
 variable "workload_autoscaler_version" {
   description = "Version of castai-workload-autoscaler helm chart. Default latest"
   type        = string
