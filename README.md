@@ -303,6 +303,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="requirement_castai"></a> [castai](#requirement\_castai) | ~> 7.39 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 2.0.0 |
+| <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.0.0 |
 
 ## Providers
 
@@ -310,7 +311,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 |------|---------|
 | <a name="provider_castai"></a> [castai](#provider\_castai) | ~> 7.17 |
 | <a name="provider_helm"></a> [helm](#provider\_helm) | >= 2.0.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | n/a |
+| <a name="provider_null"></a> [null](#provider\_null) | >= 3.0.0 |
 
 ## Modules
 
@@ -370,7 +371,7 @@ No modules.
 | <a name="input_evictor_version"></a> [evictor\_version](#input\_evictor\_version) | Version of castai-evictor chart. Default latest | `string` | `null` | no |
 | <a name="input_gke_cluster_location"></a> [gke\_cluster\_location](#input\_gke\_cluster\_location) | Location of the cluster to be connected to CAST AI. Can be region or zone for zonal clusters | `string` | n/a | yes |
 | <a name="input_gke_cluster_name"></a> [gke\_cluster\_name](#input\_gke\_cluster\_name) | Name of the cluster to be connected to CAST AI. | `string` | n/a | yes |
-| <a name="input_gke_credentials"></a> [gke\_credentials](#input\_gke\_credentials) | Optional GCP Service account credentials.json | `string` | n/a | yes |
+| <a name="input_gke_credentials"></a> [gke\_credentials](#input\_gke\_credentials) | Optional GCP Service account credentials.json. Set to `null` to connect in read-only mode | `string` | n/a | yes |
 | <a name="input_grpc_url"></a> [grpc\_url](#input\_grpc\_url) | gRPC endpoint used by pod-pinner | `string` | `"grpc.cast.ai:443"` | no |
 | <a name="input_install_cloud_proxy"></a> [install\_cloud\_proxy](#input\_install\_cloud\_proxy) | Optional flag for installation of castai-cloud-proxy | `bool` | `false` | no |
 | <a name="input_install_pod_mutator"></a> [install\_pod\_mutator](#input\_install\_pod\_mutator) | Optional flag for installation of pod mutator | `bool` | `false` | no |
