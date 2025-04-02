@@ -847,11 +847,6 @@ resource "helm_release" "castai_pod_mutator" {
   }
 
   set {
-    name  = "castai.organizationID"
-    value = var.organization_id
-  }
-
-  set {
     name  = "castai.clusterID"
     value = castai_gke_cluster.castai_cluster.id
   }
@@ -896,11 +891,6 @@ resource "helm_release" "castai_pod_mutator_self_managed" {
   set_sensitive {
     name  = "castai.apiKey"
     value = castai_gke_cluster.castai_cluster.cluster_token
-  }
-
-  set {
-    name  = "castai.organizationID"
-    value = var.organization_id
   }
 
   set {
