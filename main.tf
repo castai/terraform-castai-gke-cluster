@@ -665,7 +665,7 @@ resource "helm_release" "castai_kvisor" {
 
   set {
     name  = "castai.grpcAddr"
-    value = var.api_grpc_addr
+    value = var.kvisor_grpc_addr
   }
 
   dynamic "set" {
@@ -737,7 +737,7 @@ resource "helm_release" "castai_kvisor_self_managed" {
 
   set {
     name  = "castai.grpcAddr"
-    value = var.api_grpc_addr
+    value = var.kvisor_grpc_addr
   }
 
   dynamic "set" {
