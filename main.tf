@@ -434,7 +434,7 @@ resource "helm_release" "castai_evictor_self_managed" {
     for_each = try(var.autoscaler_settings.node_downscaler.evictor.enabled, null) == false ? [0] : []
 
     content {
-      name = "replicaCount"
+      name  = "replicaCount"
       value = set.value
     }
   }
@@ -553,7 +553,7 @@ resource "helm_release" "castai_pod_pinner_self_managed" {
     for_each = try(var.autoscaler_settings.unschedulable_pods.pod_pinner.enabled, null) == false ? [0] : []
 
     content {
-      name = "replicaCount"
+      name  = "replicaCount"
       value = set.value
     }
   }
