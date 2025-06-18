@@ -174,6 +174,24 @@ resource "castai_node_template" "this" {
       }
     }
   }
+
+  dynamic "gpu" {
+    for_each = [for gpu in flatten([lookup(each.value, "gpu", [])]) : gpu if gpu != null]
+
+    content {
+      enable_time_sharing             = try(gpu.value.enable_time_sharing, null)
+      default_shared_clients_per_gpu  = try(gpu.value.default_shared_clients_per_gpu, null)
+
+      dynamic "sharing_configuration" {
+        for_each = [for sharing_configuration in flatten([lookup(gpu.value, "sharing_configuration", [])]) : sharing_configuration if sharing_configuration != null]
+
+        content {
+          gpu_name     = try(sharing_configuration.value.gpu_name, null)
+          shared_clients_per_gpu     = try(sharing_configuration.value.shared_clients_per_gpu, null)
+        }
+      }
+    }
+  }
   depends_on = [castai_autoscaler.castai_autoscaler_policies]
 }
 

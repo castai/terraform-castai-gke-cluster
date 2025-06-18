@@ -87,6 +87,26 @@ module "castai_gke_cluster" {
         architectures           = ["amd64"]
       }
 
+      gpu = {
+        default_shared_clients_per_gpu = 9
+        enable_time_sharing            = true
+
+        sharing_configuration = [
+          {
+            gpu_name = "A100"
+            shared_clients_per_gpu = 11
+          },
+          {
+            gpu_name = "L4"
+            shared_clients_per_gpu = 5
+          },
+          {
+            gpu_name = "T4"
+            shared_clients_per_gpu = 3
+          }
+        ]
+      }
+
       custom_instances_enabled                      = true
       custom_instances_with_extended_memory_enabled = true
     }
@@ -300,7 +320,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_castai"></a> [castai](#requirement\_castai) | ~> 7.39 |
+| <a name="requirement_castai"></a> [castai](#requirement\_castai) | ~> 7.55 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | ~> 2.0 |
 
@@ -308,9 +328,9 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | 7.48.1 |
-| <a name="provider_helm"></a> [helm](#provider\_helm) | 2.17.0 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | 7.2.0 |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | 2.13.2 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.2 |
 
 ## Modules
 
