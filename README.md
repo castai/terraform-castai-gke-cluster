@@ -93,15 +93,15 @@ module "castai_gke_cluster" {
 
         sharing_configuration = [
           {
-            gpu_name = "A100"
+            gpu_name = "nvidia-a100-80gb"
             shared_clients_per_gpu = 11
           },
           {
-            gpu_name = "L4"
+            gpu_name = "nvidia-l4"
             shared_clients_per_gpu = 5
           },
           {
-            gpu_name = "T4"
+            gpu_name = "nvidia-tesla-t4"
             shared_clients_per_gpu = 3
           }
         ]
