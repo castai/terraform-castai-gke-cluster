@@ -89,29 +89,31 @@ resource "castai_node_template" "this" {
     for_each = [for constraints in flatten([lookup(each.value, "constraints", [])]) : constraints if constraints != null]
 
     content {
-      compute_optimized                           = try(constraints.value.compute_optimized, null)
-      storage_optimized                           = try(constraints.value.storage_optimized, null)
-      compute_optimized_state                     = try(constraints.value.compute_optimized_state, "")
-      storage_optimized_state                     = try(constraints.value.storage_optimized_state, "")
-      is_gpu_only                                 = try(constraints.value.is_gpu_only, false)
-      spot                                        = try(constraints.value.spot, false)
-      on_demand                                   = try(constraints.value.on_demand, null)
-      use_spot_fallbacks                          = try(constraints.value.use_spot_fallbacks, false)
-      fallback_restore_rate_seconds               = try(constraints.value.fallback_restore_rate_seconds, null)
-      enable_spot_diversity                       = try(constraints.value.enable_spot_diversity, false)
-      spot_diversity_price_increase_limit_percent = try(constraints.value.spot_diversity_price_increase_limit_percent, null)
-      spot_interruption_predictions_enabled       = try(constraints.value.spot_interruption_predictions_enabled, false)
-      spot_interruption_predictions_type          = try(constraints.value.spot_interruption_predictions_type, null)
-      min_cpu                                     = try(constraints.value.min_cpu, null)
-      max_cpu                                     = try(constraints.value.max_cpu, null)
-      min_memory                                  = try(constraints.value.min_memory, null)
-      max_memory                                  = try(constraints.value.max_memory, null)
-      architectures                               = try(constraints.value.architectures, ["amd64"])
-      architecture_priority                       = try(constraints.value.architecture_priority, [])
-      azs                                         = try(constraints.value.azs, null)
-      burstable_instances                         = try(constraints.value.burstable_instances, null)
-      customer_specific                           = try(constraints.value.customer_specific, null)
-      cpu_manufacturers                           = try(constraints.value.cpu_manufacturers, null)
+      compute_optimized                             = try(constraints.value.compute_optimized, null)
+      storage_optimized                             = try(constraints.value.storage_optimized, null)
+      compute_optimized_state                       = try(constraints.value.compute_optimized_state, "")
+      storage_optimized_state                       = try(constraints.value.storage_optimized_state, "")
+      is_gpu_only                                   = try(constraints.value.is_gpu_only, false)
+      spot                                          = try(constraints.value.spot, false)
+      on_demand                                     = try(constraints.value.on_demand, null)
+      use_spot_fallbacks                            = try(constraints.value.use_spot_fallbacks, false)
+      fallback_restore_rate_seconds                 = try(constraints.value.fallback_restore_rate_seconds, null)
+      enable_spot_diversity                         = try(constraints.value.enable_spot_diversity, false)
+      spot_diversity_price_increase_limit_percent   = try(constraints.value.spot_diversity_price_increase_limit_percent, null)
+      spot_reliability_enabled                      = try(constraints.value.spot_reliability_enabled, false)
+      spot_reliability_price_increase_limit_percent = try(constraints.value.spot_reliability_price_increase_limit_percent, null)
+      spot_interruption_predictions_enabled         = try(constraints.value.spot_interruption_predictions_enabled, false)
+      spot_interruption_predictions_type            = try(constraints.value.spot_interruption_predictions_type, null)
+      min_cpu                                       = try(constraints.value.min_cpu, null)
+      max_cpu                                       = try(constraints.value.max_cpu, null)
+      min_memory                                    = try(constraints.value.min_memory, null)
+      max_memory                                    = try(constraints.value.max_memory, null)
+      architectures                                 = try(constraints.value.architectures, ["amd64"])
+      architecture_priority                         = try(constraints.value.architecture_priority, [])
+      azs                                           = try(constraints.value.azs, null)
+      burstable_instances                           = try(constraints.value.burstable_instances, null)
+      customer_specific                             = try(constraints.value.customer_specific, null)
+      cpu_manufacturers                             = try(constraints.value.cpu_manufacturers, null)
 
       dynamic "instance_families" {
         for_each = [for instance_families in flatten([lookup(constraints.value, "instance_families", [])]) : instance_families if instance_families != null]
@@ -179,15 +181,15 @@ resource "castai_node_template" "this" {
     for_each = [for gpu in flatten([lookup(each.value, "gpu", [])]) : gpu if gpu != null]
 
     content {
-      enable_time_sharing             = try(gpu.value.enable_time_sharing, null)
-      default_shared_clients_per_gpu  = try(gpu.value.default_shared_clients_per_gpu, null)
+      enable_time_sharing            = try(gpu.value.enable_time_sharing, null)
+      default_shared_clients_per_gpu = try(gpu.value.default_shared_clients_per_gpu, null)
 
       dynamic "sharing_configuration" {
         for_each = [for sharing_configuration in flatten([lookup(gpu.value, "sharing_configuration", [])]) : sharing_configuration if sharing_configuration != null]
 
         content {
-          gpu_name     = try(sharing_configuration.value.gpu_name, null)
-          shared_clients_per_gpu     = try(sharing_configuration.value.shared_clients_per_gpu, null)
+          gpu_name               = try(sharing_configuration.value.gpu_name, null)
+          shared_clients_per_gpu = try(sharing_configuration.value.shared_clients_per_gpu, null)
         }
       }
     }
