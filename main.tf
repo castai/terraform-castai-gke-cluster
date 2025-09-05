@@ -26,6 +26,7 @@ resource "castai_node_configuration" "this" {
     network_tags                    = try(each.value.network_tags, null)
     disk_type                       = try(each.value.disk_type, null)
     use_ephemeral_storage_local_ssd = try(each.value.use_ephemeral_storage_local_ssd, null)
+    on_host_maintenance             = try(each.value.on_host_maintenance, null)
     dynamic "secondary_ip_range" {
       for_each = lookup(each.value, "secondary_ip_range", null) != null ? [each.value.secondary_ip_range] : []
       content {
