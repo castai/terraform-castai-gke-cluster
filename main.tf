@@ -903,7 +903,7 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
 }
 
 resource "helm_release" "castai_ai_optimizer_proxy" {
-  count = var.install_ai_optimizer && !var.self_managed ? 1 : 0
+  count = var.install_ai_optimizer ? 1 : 0
 
   name             = "ai-optimizer-proxy"
   repository       = "https://castai.github.io/helm-charts"
