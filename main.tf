@@ -901,3 +901,29 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
 
   depends_on = [helm_release.castai_agent, helm_release.castai_evictor, helm_release.castai_pod_pinner]
 }
+
+resource "helm_release" "castai_ai_optimizer_proxy" {
+  count = var.install_ai_optimizer && !var.self_managed ? 1 : 0
+
+  name             = "ai-optimizer-proxy"
+  repository       = "https://castai.github.io/helm-charts"
+  chart            = "castai-ai-optimizer-proxy"
+  namespace        = "castai-agent"
+  create_namespace = true
+  cleanup_on_fail  = true
+  wait             = true
+
+  set = concat(
+    local.set_cluster_id,
+    local.set_apiurl,
+    local.set_pod_labels,
+  )
+
+  set_sensitive = local.set_sensitive_apikey
+
+  depends_on = [helm_release.castai_agent]
+
+  lifecycle {
+    ignore_changes = [version]
+  }
+}

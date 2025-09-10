@@ -275,3 +275,9 @@ variable "organization_id" {
   type        = string
   default     = ""
 }
+
+variable "install_ai_optimizer" {
+  type        = bool
+  default     = false
+  description = "Optional flag for installation of AI Optimizer (https://docs.cast.ai/docs/getting-started-ai)"
+}
