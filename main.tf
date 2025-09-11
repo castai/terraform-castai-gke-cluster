@@ -905,7 +905,7 @@ resource "castai_autoscaler" "castai_autoscaler_policies" {
 resource "helm_release" "castai_ai_optimizer_proxy" {
   count = var.install_ai_optimizer && !var.self_managed ? 1 : 0
 
-  name             = "ai-optimizer-proxy"
+  name             = "castai-ai-optimizer-proxy"
   repository       = "https://castai.github.io/helm-charts"
   chart            = "castai-ai-optimizer-proxy"
   namespace        = "castai-agent"
@@ -931,7 +931,7 @@ resource "helm_release" "castai_ai_optimizer_proxy" {
 resource "helm_release" "castai_ai_optimizer_proxy_self_managed" {
   count = var.install_ai_optimizer && var.self_managed ? 1 : 0
 
-  name             = "ai-optimizer-proxy"
+  name             = "castai-ai-optimizer-proxy"
   repository       = "https://castai.github.io/helm-charts"
   chart            = "castai-ai-optimizer-proxy"
   namespace        = "castai-agent"
