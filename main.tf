@@ -921,7 +921,7 @@ resource "helm_release" "castai_ai_optimizer_proxy" {
 
   set_sensitive = local.set_sensitive_apikey
 
-  depends_on = [helm_release.castai_agent]
+  depends_on = [helm_release.castai_agent, helm_release.castai_cluster_controller]
 
   lifecycle {
     ignore_changes = [version]
@@ -947,5 +947,5 @@ resource "helm_release" "castai_ai_optimizer_proxy_self_managed" {
 
   set_sensitive = local.set_sensitive_apikey
 
-  depends_on = [helm_release.castai_agent]
+  depends_on = [helm_release.castai_agent, helm_release.castai_cluster_controller]
 }
