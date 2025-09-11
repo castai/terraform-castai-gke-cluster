@@ -913,6 +913,9 @@ resource "helm_release" "castai_ai_optimizer_proxy" {
   cleanup_on_fail  = true
   wait             = true
 
+  version = var.ai_optimizer_version
+  values  = var.ai_optimizer_values
+
   set = concat(
     local.set_cluster_id,
     local.set_apiurl,
@@ -938,6 +941,9 @@ resource "helm_release" "castai_ai_optimizer_proxy_self_managed" {
   create_namespace = true
   cleanup_on_fail  = true
   wait             = true
+
+  version = var.ai_optimizer_version
+  values  = var.ai_optimizer_values
 
   set = concat(
     local.set_cluster_id,
