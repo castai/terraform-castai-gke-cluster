@@ -248,9 +248,9 @@ resource "helm_release" "castai_agent" {
       }
     ],
     // castai-agent chart requires "apiURL" on the top level, NOT under "castai.apiURL"
-    var.api_url != "" ? [{
+    local.castware_api_url != "" ? [{
       name  = "apiURL"
-      value = var.api_url
+      value = local.castware_api_url
     }] : [],
     local.set_pod_labels,
   )
