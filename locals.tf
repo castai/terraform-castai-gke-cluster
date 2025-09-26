@@ -1,9 +1,12 @@
 locals {
+  # API URL used from within the cluster (by Castware) defaults to `api_url` but can be overwritten
+  castware_api_url = var.castware_api_url != "" ? var.castware_api_url : var.api_url
+
   # Common conditional non-sensitive values that we pass to helm_releases.
   # Set up as lists so they can be concatenated.
-  set_apiurl = var.api_url != "" ? [{
+  set_apiurl = local.castware_api_url != "" ? [{
     name  = "castai.apiURL"
-    value = var.api_url
+    value = local.castware_api_url
   }] : []
   set_cluster_id = [{
     name  = "castai.clusterID"
