@@ -158,6 +158,68 @@ module "castai_gke_cluster" {
       }
     }
   }
+
+  workload_scaling_policies = {
+    default = {
+      apply_type        = "IMMEDIATE"
+      management_option = "MANAGED"
+
+      cpu = {
+        function                 = "QUANTILE"
+        args                     = ["0.9"]
+        overhead                 = 0.15
+        look_back_period_seconds = 172800
+        min                      = 0.1
+        max                      = 2.0
+      }
+
+      memory = {
+        function                 = "MAX"
+        overhead                 = 0.35
+        look_back_period_seconds = 172800
+
+        limit = {
+          type = "NOLIMIT"
+        }
+      }
+
+      assignment_rules = {
+        rules = [
+          {
+            namespace = {
+              names = ["default", "kube-system"]
+            }
+          },
+          {
+            workload = {
+              gvk = ["Deployment", "StatefulSet"]
+              labels_expressions = [
+                {
+                  key      = "region"
+                  operator = "NotIn"
+                  values   = ["eu-west-1", "eu-west-2"]
+                },
+                {
+                  key      = "helm.sh/chart"
+                  operator = "Exists"
+                }
+              ]
+            }
+          }
+        ]
+      }
+
+      startup = {
+        period_seconds = 300
+      }
+
+      predictive_scaling = {
+        cpu = {
+          enabled = true
+        }
+      }
+    }
+  }
 }
 ```
 
