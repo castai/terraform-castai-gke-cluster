@@ -382,7 +382,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_castai"></a> [castai](#requirement\_castai) | ~> 7.65 |
+| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 8.3 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0 |
 
@@ -390,8 +390,8 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | ~> 7.65 |
-| <a name="provider_helm"></a> [helm](#provider\_helm) | >= 3.0.0 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | 7.61.0 |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | 3.0.2 |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
 
 ## Modules
@@ -441,6 +441,7 @@ No modules.
 | <a name="input_autoscaler_settings"></a> [autoscaler\_settings](#input\_autoscaler\_settings) | Optional Autoscaler policy definitions to override current autoscaler settings | `any` | `null` | no |
 | <a name="input_castai_api_token"></a> [castai\_api\_token](#input\_castai\_api\_token) | Optional CAST AI API token created in console.cast.ai API Access keys section. Used only when `wait_for_cluster_ready` is set to true | `string` | `""` | no |
 | <a name="input_castai_components_labels"></a> [castai\_components\_labels](#input\_castai\_components\_labels) | Optional additional Kubernetes labels for CAST AI pods | `map(any)` | `{}` | no |
+| <a name="input_castware_api_url"></a> [castware\_api\_url](#input\_castware\_api\_url) | URL of CAST AI API to be used from within the cluster by Cast AI applications (Castware). If left empty, `api_url` will be used within the cluster. | `string` | `""` | no |
 | <a name="input_cloud_proxy_grpc_url_override"></a> [cloud\_proxy\_grpc\_url\_override](#input\_cloud\_proxy\_grpc\_url\_override) | Override for the castai-cloud-proxy gRPC URL | `string` | `null` | no |
 | <a name="input_cloud_proxy_values"></a> [cloud\_proxy\_values](#input\_cloud\_proxy\_values) | List of YAML formatted strings with castai-cloud-proxy values | `list(string)` | `[]` | no |
 | <a name="input_cloud_proxy_version"></a> [cloud\_proxy\_version](#input\_cloud\_proxy\_version) | Version of the castai-cloud-proxy Helm chart. Defaults to latest. | `string` | `null` | no |
@@ -489,4 +490,5 @@ No modules.
 | <a name="output_castai_node_configurations"></a> [castai\_node\_configurations](#output\_castai\_node\_configurations) | Map of node configurations ids by name |
 | <a name="output_castai_node_templates"></a> [castai\_node\_templates](#output\_castai\_node\_templates) | Map of node template by name |
 | <a name="output_cluster_id"></a> [cluster\_id](#output\_cluster\_id) | CAST.AI cluster id, which can be used for accessing cluster data using API |
+| <a name="output_organization_id"></a> [organization\_id](#output\_organization\_id) | CAST.AI organization id of the cluster |
 <!-- END_TF_DOCS -->
