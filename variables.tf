@@ -70,7 +70,6 @@ variable "delete_nodes_on_disconnect" {
 variable "gke_cluster_location" {
   type        = string
   description = "Location of the cluster to be connected to CAST AI. Can be region or zone for zonal clusters"
-
 }
 
 variable "gke_credentials" {
@@ -298,4 +297,10 @@ variable "ai_optimizer_values" {
   description = "List of YAML formatted string with ai-optimizer values"
   type        = list(string)
   default     = []
+}
+
+variable "install_omni" {
+  type        = bool
+  default     = false
+  description = "Optional flag for installation of Omni product"
 }
