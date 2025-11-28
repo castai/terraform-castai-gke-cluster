@@ -197,7 +197,7 @@ resource "castai_node_template" "this" {
       }
     }
   }
-  # depends_on = [castai_autoscaler.castai_autoscaler_policies]
+  depends_on = [castai_autoscaler.castai_autoscaler_policies]
 }
 
 resource "castai_workload_scaling_policy" "this" {
