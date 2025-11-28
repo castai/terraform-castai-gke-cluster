@@ -1094,3 +1094,36 @@ resource "helm_release" "castai_ai_optimizer_proxy_self_managed" {
 
   depends_on = [helm_release.castai_agent, helm_release.castai_cluster_controller]
 }
+
+data "google_container_cluster" "gke" {
+  name     = var.gke_cluster_name
+  location = var.gke_cluster_location
+  project  = var.project_id
+}
+
+data "google_compute_subnetwork" "gke_subnet" {
+  name    = element(split("/", data.google_container_cluster.gke.subnetwork), length(split("/", data.google_container_cluster.gke.subnetwork)) - 1)
+  region  = local.cluster_region
+  project = var.project_id
+}
+
+module "castai_omni_cluster" {
+  count  = var.install_omni && !var.self_managed ? 1 : 0
+  source = "github.com/castai/terraform-castai-omni-cluster"
+
+  k8s_provider    = "gke"
+  api_url         = var.api_url
+  api_token       = var.castai_api_token
+  organization_id = castai_gke_cluster.castai_cluster.organization_id
+  cluster_id      = castai_gke_cluster.castai_cluster.id
+  cluster_name    = var.gke_cluster_name
+  cluster_region  = local.cluster_region
+  cluster_zone    = local.cluster_zone
+
+  api_server_address    = data.google_container_cluster.gke.endpoint
+  pod_cidr              = data.google_container_cluster.gke.cluster_ipv4_cidr
+  service_cidr          = data.google_container_cluster.gke.services_ipv4_cidr
+  reserved_subnet_cidrs = [data.google_compute_subnetwork.gke_subnet.ip_cidr_range]
+
+  depends_on = [helm_release.castai_agent, helm_release.castai_cluster_controller]
+}
