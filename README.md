@@ -118,18 +118,6 @@ module "castai_gke_cluster" {
 
     unschedulable_pods = {
       enabled = true
-
-      headroom = {
-        enabled           = true
-        cpu_percentage    = 10
-        memory_percentage = 10
-      }
-
-      headroom_spot = {
-        enabled           = true
-        cpu_percentage    = 10
-        memory_percentage = 10
-      }
     }
 
     node_downscaler = {
@@ -371,6 +359,125 @@ module "castai-gke-cluster" {
 }
 ```
 
+Migrating from 9.x.x to 10.x.x
+---------------------------
+
+Version 10.x.x removes deprecated `autoscaler_settings` fields. These settings should now be configured via `node_templates` constraints.
+
+### Removed Fields
+
+The following fields have been removed from `autoscaler_settings`:
+
+| Removed Field | Migration Path |
+|--------------|----------------|
+| `unschedulable_pods.custom_instances_enabled` | Use `node_templates.<name>.custom_instances_enabled` |
+| `unschedulable_pods.headroom` | Deploy low-priority placeholder workloads ([docs](https://docs.cast.ai/docs/autoscaler-faq#how-can-i-maintain-cluster-headroom)) |
+| `unschedulable_pods.headroom_spot` | Deploy low-priority placeholder workloads ([docs](https://docs.cast.ai/docs/autoscaler-faq#how-can-i-maintain-cluster-headroom)) |
+| `unschedulable_pods.node_constraints` | Use `node_templates.<name>.constraints` (`min_cpu`, `max_cpu`, `min_memory`, `max_memory`) |
+| `spot_instances.enabled` | Use `node_templates.<name>.constraints.spot` |
+| `spot_instances.spot_backups` | Use `node_templates.<name>.constraints.use_spot_fallbacks` and `fallback_restore_rate_seconds` |
+| `spot_instances.spot_diversity_enabled` | Use `node_templates.<name>.constraints.enable_spot_diversity` |
+| `spot_instances.spot_diversity_price_increase_limit` | Use `node_templates.<name>.constraints.spot_diversity_price_increase_limit_percent` |
+| `spot_instances.spot_interruption_predictions` | Use `node_templates.<name>.constraints.spot_interruption_predictions_enabled` and `spot_interruption_predictions_type` |
+
+### Migration Example
+
+Old configuration:
+```hcl
+module "castai-gke-cluster" {
+  source = "castai/gke-cluster/castai"
+
+  autoscaler_settings = {
+    enabled = true
+
+    unschedulable_pods = {
+      enabled                  = true
+      custom_instances_enabled = true
+
+      headroom = {
+        enabled           = true
+        cpu_percentage    = 10
+        memory_percentage = 10
+      }
+
+      node_constraints = {
+        min_cpu_cores = 4
+        max_cpu_cores = 32
+      }
+    }
+
+    spot_instances = {
+      enabled = true
+      spot_backups = {
+        enabled = true
+      }
+    }
+  }
+}
+```
+
+New configuration:
+```hcl
+module "castai-gke-cluster" {
+  source = "castai/gke-cluster/castai"
+
+  autoscaler_settings = {
+    enabled = true
+
+    unschedulable_pods = {
+      enabled = true
+    }
+  }
+
+  node_templates = {
+    default_by_castai = {
+      configuration_id = module.castai-gke-cluster.castai_node_configurations["default"]
+      is_default       = true
+
+      custom_instances_enabled = true
+
+      constraints = {
+        min_cpu            = 4
+        max_cpu            = 32
+        spot               = true
+        use_spot_fallbacks = true
+      }
+    }
+  }
+}
+```
+
+### Headroom Migration
+
+Headroom functionality has been replaced with the recommended approach of deploying low-priority placeholder workloads. This provides more flexibility and follows Kubernetes native patterns.
+
+See the [CAST AI documentation on maintaining cluster headroom](https://docs.cast.ai/docs/autoscaler-faq#how-can-i-maintain-cluster-headroom) for detailed instructions.
+
+Example placeholder deployment:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: headroom-placeholder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: headroom-placeholder
+  template:
+    metadata:
+      labels:
+        app: headroom-placeholder
+    spec:
+      priorityClassName: low-priority  # Create a PriorityClass with low priority
+      containers:
+      - name: pause
+        image: registry.k8s.io/pause:3.9
+        resources:
+          requests:
+            cpu: "2"      # Adjust based on desired headroom
+            memory: "4Gi"
+```
 
 # Examples
 
