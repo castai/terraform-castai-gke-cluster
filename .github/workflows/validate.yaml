@@ -30,7 +30,17 @@ jobs:
       - name: Terraform validate
         run: "terraform validate"
 
-      
+      - name: Terraform fmt
+        run: |
+          terraform fmt
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "ERROR: terraform fmt resulted in changes. Run 'terraform fmt' locally and append the changes."
+            echo
+            git diff
+            echo
+            git status
+            exit 1
+          fi
 
   tflint:
     runs-on: ubuntu-latest
