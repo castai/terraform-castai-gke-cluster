@@ -1096,12 +1096,16 @@ resource "helm_release" "castai_ai_optimizer_proxy_self_managed" {
 }
 
 data "google_container_cluster" "gke" {
+  count  = var.install_omni && !var.self_managed ? 1 : 0
+
   name     = var.gke_cluster_name
   location = var.gke_cluster_location
   project  = var.project_id
 }
 
 data "google_compute_subnetwork" "gke_subnet" {
+  count  = var.install_omni && !var.self_managed ? 1 : 0
+
   name    = element(split("/", data.google_container_cluster.gke.subnetwork), length(split("/", data.google_container_cluster.gke.subnetwork)) - 1)
   region  = local.cluster_region
   project = var.project_id
