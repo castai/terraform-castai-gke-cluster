@@ -32,7 +32,6 @@ module "castai_gke_cluster" {
 
   gke_credentials            = module.castai_gke_iam.private_key
   delete_nodes_on_disconnect = var.delete_nodes_on_disconnect
-  autoscaler_policies_json   = var.autoscaler_policies_json
 
   default_node_configuration = module.castai_gke_cluster.node_configurations["default"]
 
@@ -362,9 +361,11 @@ module "castai-gke-cluster" {
 Migrating from 9.x.x to 10.x.x
 ---------------------------
 
-Version 10.x.x removes deprecated `autoscaler_settings` fields. These settings should now be configured via `node_templates` constraints.
+Version 10.x.x removes deprecated fields. These settings should now be configured via `node_templates` constraints.
 
 ### Removed Fields
+
+The `autoscaler_policies_json` variable has been removed. Use `autoscaler_settings` instead.
 
 The following fields have been removed from `autoscaler_settings`:
 

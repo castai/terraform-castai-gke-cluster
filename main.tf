@@ -898,8 +898,6 @@ resource "helm_release" "castai_pod_mutator_self_managed" {
 resource "castai_autoscaler" "castai_autoscaler_policies" {
   cluster_id = castai_gke_cluster.castai_cluster.id
 
-  autoscaler_policies_json = var.autoscaler_policies_json
-
   dynamic "autoscaler_settings" {
     for_each = var.autoscaler_settings != null ? [var.autoscaler_settings] : []
 
