@@ -498,13 +498,16 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | 7.61.0 |
-| <a name="provider_helm"></a> [helm](#provider\_helm) | 3.0.2 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 8.3 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 2.49 |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | >= 3.0.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_castai_omni_cluster"></a> [castai\_omni\_cluster](#module\_castai\_omni\_cluster) | github.com/castai/terraform-castai-omni-cluster | n/a |
 
 ## Resources
 
@@ -535,6 +538,8 @@ No modules.
 | [helm_release.castai_workload_autoscaler](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_workload_autoscaler_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [null_resource.wait_for_cluster](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [google_compute_subnetwork.gke_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_subnetwork) | data source |
+| [google_container_cluster.gke](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/container_cluster) | data source |
 
 ## Inputs
 
@@ -545,7 +550,6 @@ No modules.
 | <a name="input_ai_optimizer_values"></a> [ai\_optimizer\_values](#input\_ai\_optimizer\_values) | List of YAML formatted string with ai-optimizer values | `list(string)` | `[]` | no |
 | <a name="input_ai_optimizer_version"></a> [ai\_optimizer\_version](#input\_ai\_optimizer\_version) | Version of castai-ai-optimizer helm chart. Default latest | `string` | `null` | no |
 | <a name="input_api_url"></a> [api\_url](#input\_api\_url) | URL of alternative CAST AI API to be used during development or testing | `string` | `"https://api.cast.ai"` | no |
-| <a name="input_autoscaler_policies_json"></a> [autoscaler\_policies\_json](#input\_autoscaler\_policies\_json) | Optional json object to override CAST AI cluster autoscaler policies. Deprecated, use `autoscaler_settings` instead. | `string` | `null` | no |
 | <a name="input_autoscaler_settings"></a> [autoscaler\_settings](#input\_autoscaler\_settings) | Optional Autoscaler policy definitions to override current autoscaler settings | `any` | `null` | no |
 | <a name="input_castai_api_token"></a> [castai\_api\_token](#input\_castai\_api\_token) | Optional CAST AI API token created in console.cast.ai API Access keys section. Used only when `wait_for_cluster_ready` is set to true | `string` | `""` | no |
 | <a name="input_castai_components_labels"></a> [castai\_components\_labels](#input\_castai\_components\_labels) | Optional additional Kubernetes labels for CAST AI pods | `map(any)` | `{}` | no |
@@ -568,6 +572,7 @@ No modules.
 | <a name="input_grpc_url"></a> [grpc\_url](#input\_grpc\_url) | gRPC endpoint used by pod-pinner | `string` | `"grpc.cast.ai:443"` | no |
 | <a name="input_install_ai_optimizer"></a> [install\_ai\_optimizer](#input\_install\_ai\_optimizer) | Optional flag for installation of AI Optimizer (https://docs.cast.ai/docs/getting-started-ai) | `bool` | `false` | no |
 | <a name="input_install_cloud_proxy"></a> [install\_cloud\_proxy](#input\_install\_cloud\_proxy) | Optional flag for installation of castai-cloud-proxy | `bool` | `false` | no |
+| <a name="input_install_omni"></a> [install\_omni](#input\_install\_omni) | Optional flag for installation of Omni product | `bool` | `false` | no |
 | <a name="input_install_pod_mutator"></a> [install\_pod\_mutator](#input\_install\_pod\_mutator) | Optional flag for installation of pod mutator | `bool` | `false` | no |
 | <a name="input_install_security_agent"></a> [install\_security\_agent](#input\_install\_security\_agent) | Optional flag for installation of security agent (Kvisor - https://docs.cast.ai/docs/kvisor) | `bool` | `false` | no |
 | <a name="input_install_workload_autoscaler"></a> [install\_workload\_autoscaler](#input\_install\_workload\_autoscaler) | Optional flag for installation of workload autoscaler (https://docs.cast.ai/docs/workload-autoscaling-configuration) | `bool` | `false` | no |
