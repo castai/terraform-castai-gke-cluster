@@ -1032,13 +1032,17 @@ resource "helm_release" "castai_ai_optimizer_proxy_self_managed" {
 }
 
 data "google_container_cluster" "gke" {
+  count = var.install_omni && !var.self_managed ? 1 : 0
+
   name     = var.gke_cluster_name
   location = var.gke_cluster_location
   project  = var.project_id
 }
 
 data "google_compute_subnetwork" "gke_subnet" {
-  name    = element(split("/", data.google_container_cluster.gke.subnetwork), length(split("/", data.google_container_cluster.gke.subnetwork)) - 1)
+  count = var.install_omni && !var.self_managed ? 1 : 0
+
+  name    = element(split("/", data.google_container_cluster.gke[0].subnetwork), length(split("/", data.google_container_cluster.gke[0].subnetwork)) - 1)
   region  = local.cluster_region
   project = var.project_id
 }
@@ -1056,10 +1060,10 @@ module "castai_omni_cluster" {
   cluster_region  = local.cluster_region
   cluster_zone    = local.cluster_zone
 
-  api_server_address    = data.google_container_cluster.gke.endpoint
-  pod_cidr              = data.google_container_cluster.gke.cluster_ipv4_cidr
-  service_cidr          = data.google_container_cluster.gke.services_ipv4_cidr
-  reserved_subnet_cidrs = [data.google_compute_subnetwork.gke_subnet.ip_cidr_range]
+  api_server_address    = data.google_container_cluster.gke[0].endpoint
+  pod_cidr              = data.google_container_cluster.gke[0].cluster_ipv4_cidr
+  service_cidr          = data.google_container_cluster.gke[0].services_ipv4_cidr
+  reserved_subnet_cidrs = [data.google_compute_subnetwork.gke_subnet[0].ip_cidr_range]
 
   depends_on = [helm_release.castai_agent, helm_release.castai_cluster_controller]
 }
