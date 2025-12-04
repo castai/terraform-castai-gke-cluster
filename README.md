@@ -32,7 +32,6 @@ module "castai_gke_cluster" {
 
   gke_credentials            = module.castai_gke_iam.private_key
   delete_nodes_on_disconnect = var.delete_nodes_on_disconnect
-  autoscaler_policies_json   = var.autoscaler_policies_json
 
   default_node_configuration = module.castai_gke_cluster.node_configurations["default"]
 
@@ -118,18 +117,6 @@ module "castai_gke_cluster" {
 
     unschedulable_pods = {
       enabled = true
-
-      headroom = {
-        enabled           = true
-        cpu_percentage    = 10
-        memory_percentage = 10
-      }
-
-      headroom_spot = {
-        enabled           = true
-        cpu_percentage    = 10
-        memory_percentage = 10
-      }
     }
 
     node_downscaler = {
@@ -371,6 +358,127 @@ module "castai-gke-cluster" {
 }
 ```
 
+Migrating from 9.x.x to 10.x.x
+---------------------------
+
+Version 10.x.x removes deprecated fields. These settings should now be configured via `node_templates` constraints.
+
+### Removed Fields
+
+The `autoscaler_policies_json` variable has been removed. Use `autoscaler_settings` instead.
+
+The following fields have been removed from `autoscaler_settings`:
+
+| Removed Field | Migration Path |
+|--------------|----------------|
+| `unschedulable_pods.custom_instances_enabled` | Use `node_templates.<name>.custom_instances_enabled` |
+| `unschedulable_pods.headroom` | Deploy low-priority placeholder workloads ([docs](https://docs.cast.ai/docs/autoscaler-faq#how-can-i-maintain-cluster-headroom)) |
+| `unschedulable_pods.headroom_spot` | Deploy low-priority placeholder workloads ([docs](https://docs.cast.ai/docs/autoscaler-faq#how-can-i-maintain-cluster-headroom)) |
+| `unschedulable_pods.node_constraints` | Use `node_templates.<name>.constraints` (`min_cpu`, `max_cpu`, `min_memory`, `max_memory`) |
+| `spot_instances.enabled` | Use `node_templates.<name>.constraints.spot` |
+| `spot_instances.spot_backups` | Use `node_templates.<name>.constraints.use_spot_fallbacks` and `fallback_restore_rate_seconds` |
+| `spot_instances.spot_diversity_enabled` | Use `node_templates.<name>.constraints.enable_spot_diversity` |
+| `spot_instances.spot_diversity_price_increase_limit` | Use `node_templates.<name>.constraints.spot_diversity_price_increase_limit_percent` |
+| `spot_instances.spot_interruption_predictions` | Use `node_templates.<name>.constraints.spot_interruption_predictions_enabled` and `spot_interruption_predictions_type` |
+
+### Migration Example
+
+Old configuration:
+```hcl
+module "castai-gke-cluster" {
+  source = "castai/gke-cluster/castai"
+
+  autoscaler_settings = {
+    enabled = true
+
+    unschedulable_pods = {
+      enabled                  = true
+      custom_instances_enabled = true
+
+      headroom = {
+        enabled           = true
+        cpu_percentage    = 10
+        memory_percentage = 10
+      }
+
+      node_constraints = {
+        min_cpu_cores = 4
+        max_cpu_cores = 32
+      }
+    }
+
+    spot_instances = {
+      enabled = true
+      spot_backups = {
+        enabled = true
+      }
+    }
+  }
+}
+```
+
+New configuration:
+```hcl
+module "castai-gke-cluster" {
+  source = "castai/gke-cluster/castai"
+
+  autoscaler_settings = {
+    enabled = true
+
+    unschedulable_pods = {
+      enabled = true
+    }
+  }
+
+  node_templates = {
+    default_by_castai = {
+      configuration_id = module.castai-gke-cluster.castai_node_configurations["default"]
+      is_default       = true
+
+      custom_instances_enabled = true
+
+      constraints = {
+        min_cpu            = 4
+        max_cpu            = 32
+        spot               = true
+        use_spot_fallbacks = true
+      }
+    }
+  }
+}
+```
+
+### Headroom Migration
+
+Headroom functionality has been replaced with the recommended approach of deploying low-priority placeholder workloads. This provides more flexibility and follows Kubernetes native patterns.
+
+See the [CAST AI documentation on maintaining cluster headroom](https://docs.cast.ai/docs/autoscaler-faq#how-can-i-maintain-cluster-headroom) for detailed instructions.
+
+Example placeholder deployment:
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: headroom-placeholder
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: headroom-placeholder
+  template:
+    metadata:
+      labels:
+        app: headroom-placeholder
+    spec:
+      priorityClassName: low-priority  # Create a PriorityClass with low priority
+      containers:
+      - name: pause
+        image: registry.k8s.io/pause:3.9
+        resources:
+          requests:
+            cpu: "2"      # Adjust based on desired headroom
+            memory: "4Gi"
+```
 
 # Examples
 
@@ -390,13 +498,16 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | 7.61.0 |
-| <a name="provider_helm"></a> [helm](#provider\_helm) | 3.0.2 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 8.3 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 2.49 |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | >= 3.0.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | n/a |
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_castai_omni_cluster"></a> [castai\_omni\_cluster](#module\_castai\_omni\_cluster) | github.com/castai/terraform-castai-omni-cluster | n/a |
 
 ## Resources
 
@@ -427,6 +538,8 @@ No modules.
 | [helm_release.castai_workload_autoscaler](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_workload_autoscaler_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [null_resource.wait_for_cluster](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [google_compute_subnetwork.gke_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_subnetwork) | data source |
+| [google_container_cluster.gke](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/container_cluster) | data source |
 
 ## Inputs
 
@@ -437,7 +550,6 @@ No modules.
 | <a name="input_ai_optimizer_values"></a> [ai\_optimizer\_values](#input\_ai\_optimizer\_values) | List of YAML formatted string with ai-optimizer values | `list(string)` | `[]` | no |
 | <a name="input_ai_optimizer_version"></a> [ai\_optimizer\_version](#input\_ai\_optimizer\_version) | Version of castai-ai-optimizer helm chart. Default latest | `string` | `null` | no |
 | <a name="input_api_url"></a> [api\_url](#input\_api\_url) | URL of alternative CAST AI API to be used during development or testing | `string` | `"https://api.cast.ai"` | no |
-| <a name="input_autoscaler_policies_json"></a> [autoscaler\_policies\_json](#input\_autoscaler\_policies\_json) | Optional json object to override CAST AI cluster autoscaler policies. Deprecated, use `autoscaler_settings` instead. | `string` | `null` | no |
 | <a name="input_autoscaler_settings"></a> [autoscaler\_settings](#input\_autoscaler\_settings) | Optional Autoscaler policy definitions to override current autoscaler settings | `any` | `null` | no |
 | <a name="input_castai_api_token"></a> [castai\_api\_token](#input\_castai\_api\_token) | Optional CAST AI API token created in console.cast.ai API Access keys section. Used only when `wait_for_cluster_ready` is set to true | `string` | `""` | no |
 | <a name="input_castai_components_labels"></a> [castai\_components\_labels](#input\_castai\_components\_labels) | Optional additional Kubernetes labels for CAST AI pods | `map(any)` | `{}` | no |
@@ -460,6 +572,7 @@ No modules.
 | <a name="input_grpc_url"></a> [grpc\_url](#input\_grpc\_url) | gRPC endpoint used by pod-pinner | `string` | `"grpc.cast.ai:443"` | no |
 | <a name="input_install_ai_optimizer"></a> [install\_ai\_optimizer](#input\_install\_ai\_optimizer) | Optional flag for installation of AI Optimizer (https://docs.cast.ai/docs/getting-started-ai) | `bool` | `false` | no |
 | <a name="input_install_cloud_proxy"></a> [install\_cloud\_proxy](#input\_install\_cloud\_proxy) | Optional flag for installation of castai-cloud-proxy | `bool` | `false` | no |
+| <a name="input_install_omni"></a> [install\_omni](#input\_install\_omni) | Optional flag for installation of Omni product | `bool` | `false` | no |
 | <a name="input_install_pod_mutator"></a> [install\_pod\_mutator](#input\_install\_pod\_mutator) | Optional flag for installation of pod mutator | `bool` | `false` | no |
 | <a name="input_install_security_agent"></a> [install\_security\_agent](#input\_install\_security\_agent) | Optional flag for installation of security agent (Kvisor - https://docs.cast.ai/docs/kvisor) | `bool` | `false` | no |
 | <a name="input_install_workload_autoscaler"></a> [install\_workload\_autoscaler](#input\_install\_workload\_autoscaler) | Optional flag for installation of workload autoscaler (https://docs.cast.ai/docs/workload-autoscaling-configuration) | `bool` | `false` | no |
