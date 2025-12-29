@@ -713,33 +713,6 @@ resource "helm_release" "castai_kvisor" {
 
 }
 
-resource "helm_release" "castai_cloud_proxy" {
-  count = var.install_cloud_proxy ? 1 : 0
-
-  name             = "castai-cloud-proxy"
-  repository       = "https://castai.github.io/helm-charts"
-  chart            = "castai-cloud-proxy"
-  version          = var.cloud_proxy_version
-  namespace        = "castai-agent"
-  create_namespace = true
-  cleanup_on_fail  = true
-  wait             = true
-
-  values = var.cloud_proxy_values
-
-  set = concat(
-    [
-      {
-        name  = "castai.grpcURL"
-        value = coalesce(var.cloud_proxy_grpc_url_override, var.grpc_url)
-      }
-    ],
-    local.set_cluster_id,
-  )
-
-  set_sensitive = local.set_sensitive_apikey
-}
-
 resource "helm_release" "castai_kvisor_self_managed" {
   count = var.install_security_agent && var.self_managed ? 1 : 0
 
