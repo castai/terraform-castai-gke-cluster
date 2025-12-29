@@ -227,30 +227,6 @@ variable "workload_autoscaler_values" {
   default     = []
 }
 
-variable "install_cloud_proxy" {
-  description = "Optional flag for installation of castai-cloud-proxy"
-  type        = bool
-  default     = false
-}
-
-variable "cloud_proxy_version" {
-  description = "Version of the castai-cloud-proxy Helm chart. Defaults to latest."
-  type        = string
-  default     = null
-}
-
-variable "cloud_proxy_values" {
-  description = "List of YAML formatted strings with castai-cloud-proxy values"
-  type        = list(string)
-  default     = []
-}
-
-variable "cloud_proxy_grpc_url_override" {
-  description = "Override for the castai-cloud-proxy gRPC URL"
-  type        = string
-  default     = null
-}
-
 variable "install_pod_mutator" {
   description = "Optional flag for installation of pod mutator"
   type        = bool
