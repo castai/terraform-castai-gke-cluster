@@ -155,6 +155,12 @@ variable "kvisor_version" {
   default     = null
 }
 
+variable "kvisor_wait" {
+  description = "Wait for kvisor chart to finish release"
+  type        = bool
+  default     = true
+}
+
 variable "agent_values" {
   description = "List of YAML formatted string values for agent helm chart"
   type        = list(string)
