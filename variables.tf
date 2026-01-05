@@ -77,6 +77,12 @@ variable "castai_components_labels" {
   default     = {}
 }
 
+variable "castai_components_sets" {
+  type        = map(string)
+  description = "Optional additional 'set' configurations for every CAST AI Helm release."
+  default     = {}
+}
+
 variable "node_configurations" {
   type        = any
   description = "Map of GKE node configurations to create"
