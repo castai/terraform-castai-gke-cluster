@@ -687,8 +687,9 @@ resource "helm_release" "castai_kvisor" {
   create_namespace = true
   cleanup_on_fail  = true
 
-  version = var.kvisor_version
   values  = var.kvisor_values
+  version = var.kvisor_version
+  wait    = var.kvisor_wait
 
   lifecycle {
     ignore_changes = [version]
@@ -723,8 +724,9 @@ resource "helm_release" "castai_kvisor_self_managed" {
   create_namespace = true
   cleanup_on_fail  = true
 
-  version = var.kvisor_version
   values  = var.kvisor_values
+  version = var.kvisor_version
+  wait    = var.kvisor_wait
 
   set = concat(
     [
