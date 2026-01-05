@@ -33,6 +33,10 @@ locals {
     name  = "podLabels.${k}"
     value = v
   }]
+  set_components_sets = [for k, v in var.castai_components_sets : {
+    name  = k
+    value = v
+  }]
 
 
   # Common conditional SENSITIVE values that we pass to helm_releases.
