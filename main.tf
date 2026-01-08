@@ -1045,8 +1045,9 @@ data "google_compute_subnetwork" "gke_subnet" {
 }
 
 module "castai_omni_cluster" {
-  count  = var.install_omni && !var.self_managed ? 1 : 0
-  source = "github.com/castai/terraform-castai-omni-cluster"
+  count   = var.install_omni && !var.self_managed ? 1 : 0
+  source  = "castai/omni-cluster/castai"
+  version = "~> 1"
 
   k8s_provider    = "gke"
   api_url         = var.api_url
