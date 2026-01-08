@@ -2,7 +2,6 @@ locals {
   # Determine if cluster location is a zone (contains 3 parts like us-central1-a) or region (2 parts like us-central1)
   is_zonal       = length(regexall("^.*-[a-z]$", var.gke_cluster_location)) > 0
   cluster_region = local.is_zonal ? regex("^(.*)-[a-z]$", var.gke_cluster_location)[0] : var.gke_cluster_location
-  cluster_zone   = local.is_zonal ? var.gke_cluster_location : ""
 
   # API URL used from within the cluster (by Castware) defaults to `api_url` but can be overwritten
   castware_api_url = var.castware_api_url != "" ? var.castware_api_url : var.api_url

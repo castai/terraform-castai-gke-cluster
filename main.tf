@@ -1047,7 +1047,7 @@ data "google_compute_subnetwork" "gke_subnet" {
 module "castai_omni_cluster" {
   count   = var.install_omni && !var.self_managed ? 1 : 0
   source  = "castai/omni-cluster/castai"
-  version = "~> 1"
+  version = "~> 2.0"
 
   k8s_provider    = "gke"
   api_url         = var.api_url
@@ -1055,8 +1055,6 @@ module "castai_omni_cluster" {
   organization_id = castai_gke_cluster.castai_cluster.organization_id
   cluster_id      = castai_gke_cluster.castai_cluster.id
   cluster_name    = var.gke_cluster_name
-  cluster_region  = local.cluster_region
-  cluster_zone    = local.cluster_zone
 
   api_server_address    = data.google_container_cluster.gke[0].endpoint
   pod_cidr              = data.google_container_cluster.gke[0].cluster_ipv4_cidr
