@@ -171,7 +171,7 @@ module "castai_gke_cluster" {
         look_back_period_seconds = 172800
 
         limit = {
-          type = "NOLIMIT"
+          type = "NO_LIMIT"
         }
       }
 
