@@ -185,6 +185,7 @@ resource "castai_node_template" "this" {
 
     content {
       enable_time_sharing            = try(gpu.value.enable_time_sharing, null)
+      sharing_strategy               = try(gpu.value.sharing_strategy, null)
       default_shared_clients_per_gpu = try(gpu.value.default_shared_clients_per_gpu, null)
       user_managed_gpu_drivers       = try(gpu.value.user_managed_gpu_drivers, null)
 

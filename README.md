@@ -92,7 +92,7 @@ module "castai_gke_cluster" {
 
       gpu = {
         default_shared_clients_per_gpu = 9
-        enable_time_sharing            = true
+        sharing_strategy               = "time-slicing"
         user_managed_gpu_drivers       = false
 
         sharing_configuration = [
