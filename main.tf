@@ -71,6 +71,7 @@ resource "castai_node_template" "this" {
   is_default                                    = try(each.value.is_default, false)
   is_enabled                                    = try(each.value.is_enabled, true)
   should_taint                                  = try(each.value.should_taint, true)
+  clm_enabled                                   = try(each.value.clm_enabled, false)
   custom_instances_enabled                      = try(each.value.custom_instances_enabled, false)
   custom_instances_with_extended_memory_enabled = try(each.value.custom_instances_with_extended_memory_enabled, false)
 
@@ -1096,6 +1097,31 @@ resource "helm_release" "castai_ai_optimizer_proxy_self_managed" {
   set_sensitive = local.set_sensitive_apikey
 
   depends_on = [helm_release.castai_agent, helm_release.castai_cluster_controller]
+}
+
+resource "helm_release" "castai_live" {
+  count = var.install_live ? 1 : 0
+
+  name             = "castai-live"
+  repository       = "https://castai.github.io/helm-charts"
+  chart            = "castai-live"
+  namespace        = "castai-agent"
+  create_namespace = true
+  cleanup_on_fail  = true
+  wait             = true
+
+  version = var.live_version
+  values  = var.live_values
+
+  set = concat(
+    local.set_cluster_id,
+    local.set_apiurl,
+    local.set_components_sets,
+  )
+
+  set_sensitive = local.set_sensitive_apikey
+
+  depends_on = [helm_release.castai_agent]
 }
 
 data "google_container_cluster" "gke" {
