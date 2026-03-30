@@ -210,6 +210,14 @@ module "castai_gke_cluster" {
           enabled = true
         }
       }
+
+      jvm = {
+        memory = {
+          optimization = true
+        }
+      }
+
+      excluded_containers = ["container-1", "container-2"]
     }
   }
 }
@@ -495,7 +503,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 8.3 |
+| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 8.24.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.0 |
@@ -504,10 +512,10 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | 7.61.0 |
-| <a name="provider_google"></a> [google](#provider\_google) | 6.46.0 |
-| <a name="provider_helm"></a> [helm](#provider\_helm) | 3.0.2 |
-| <a name="provider_null"></a> [null](#provider\_null) | >= 3.0 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | 8.24.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 7.25.0 |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | 3.1.1 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
 
 ## Modules
 
@@ -541,9 +549,9 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | [helm_release.castai_pod_pinner_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_spot_handler](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_workload_autoscaler](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
-| [helm_release.castai_workload_autoscaler_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_workload_autoscaler_exporter](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_workload_autoscaler_exporter_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.castai_workload_autoscaler_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [null_resource.wait_for_cluster](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [google_compute_subnetwork.gke_subnet](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_subnetwork) | data source |
 | [google_container_cluster.gke](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/container_cluster) | data source |
@@ -598,10 +606,10 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="input_spot_handler_values"></a> [spot\_handler\_values](#input\_spot\_handler\_values) | List of YAML formatted string values for spot-handler helm chart | `list(string)` | `[]` | no |
 | <a name="input_spot_handler_version"></a> [spot\_handler\_version](#input\_spot\_handler\_version) | Version of castai-spot-handler helm chart. Default latest | `string` | `null` | no |
 | <a name="input_wait_for_cluster_ready"></a> [wait\_for\_cluster\_ready](#input\_wait\_for\_cluster\_ready) | Wait for cluster to be ready before finishing the module execution, this option requires `castai_api_token` to be set | `bool` | `false` | no |
+| <a name="input_workload_autoscaler_exporter_values"></a> [workload\_autoscaler\_exporter\_values](#input\_workload\_autoscaler\_exporter\_values) | List of YAML formatted string with castai-workload-autoscaler-exporter values | `list(string)` | `[]` | no |
+| <a name="input_workload_autoscaler_exporter_version"></a> [workload\_autoscaler\_exporter\_version](#input\_workload\_autoscaler\_exporter\_version) | Version of castai-workload-autoscaler-exporter helm chart. Default latest | `string` | `null` | no |
 | <a name="input_workload_autoscaler_values"></a> [workload\_autoscaler\_values](#input\_workload\_autoscaler\_values) | List of YAML formatted string with cluster-workload-autoscaler values | `list(string)` | `[]` | no |
 | <a name="input_workload_autoscaler_version"></a> [workload\_autoscaler\_version](#input\_workload\_autoscaler\_version) | Version of castai-workload-autoscaler helm chart. Default latest | `string` | `null` | no |
-| <a name="input_workload_autoscaler_exporter_values"></a> [workload\_autoscaler\_exporter\_values](#input\_workload\_autoscaler\_exporter\_values) | List of YAML formatted string with workload-autoscaler-exporter values | `list(string)` | `[]` | no |
-| <a name="input_workload_autoscaler_exporter_version"></a> [workload\_autoscaler\_exporter\_version](#input\_workload\_autoscaler\_exporter\_version) | Version of castai-workload-autoscaler-exporter helm chart. Default latest | `string` | `null` | no |
 | <a name="input_workload_scaling_policies"></a> [workload\_scaling\_policies](#input\_workload\_scaling\_policies) | Map of workload scaling policies to create | `any` | `{}` | no |
 
 ## Outputs
