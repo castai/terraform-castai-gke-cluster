@@ -373,6 +373,19 @@ resource "castai_workload_scaling_policy" "this" {
       }
     }
   }
+
+  dynamic "anomaly_detection" {
+    for_each = try([each.value.anomaly_detection], [])
+    content {
+      dynamic "cpu_pressure" {
+        for_each = try([anomaly_detection.value.cpu_pressure], [])
+        content {
+          cpu_stall_threshold_percentage = try(cpu_pressure.value.cpu_stall_threshold_percentage, null)
+          min_pressured_pod_percentage   = try(cpu_pressure.value.min_pressured_pod_percentage, null)
+        }
+      }
+    }
+  }
 }
 
 resource "castai_workload_custom_metrics_data_source" "this" {

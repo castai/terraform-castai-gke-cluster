@@ -217,6 +217,13 @@ module "castai_gke_cluster" {
         }
       }
 
+      anomaly_detection = {
+        cpu_pressure = {
+          cpu_stall_threshold_percentage = 50
+          min_pressured_pod_percentage   = 30
+        }
+      }
+
       excluded_containers = ["container-1", "container-2"]
     }
   }
