@@ -210,6 +210,14 @@ module "castai_gke_cluster" {
           enabled = true
         }
       }
+
+      jvm = {
+        memory = {
+          optimization = true
+        }
+      }
+
+      excluded_containers = ["container-1", "container-2"]
     }
   }
 }
@@ -495,7 +503,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 8.16 |
+| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 8.24.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.0.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.0 |
@@ -504,8 +512,8 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | 8.23.3 |
-| <a name="provider_google"></a> [google](#provider\_google) | 7.24.0 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | 8.24.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | 7.25.0 |
 | <a name="provider_helm"></a> [helm](#provider\_helm) | 3.1.1 |
 | <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
 
