@@ -394,6 +394,8 @@ resource "castai_workload_custom_metrics_data_source" "this" {
       }
     }
   }
+
+  depends_on = [helm_release.castai_workload_autoscaler]
 }
 
 resource "helm_release" "castai_agent" {
