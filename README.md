@@ -529,10 +529,10 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | 8.24.0 |
-| <a name="provider_google"></a> [google](#provider\_google) | 7.25.0 |
-| <a name="provider_helm"></a> [helm](#provider\_helm) | 3.1.1 |
-| <a name="provider_null"></a> [null](#provider\_null) | 3.2.4 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 8.26.0 |
+| <a name="provider_google"></a> [google](#provider\_google) | >= 2.49 |
+| <a name="provider_helm"></a> [helm](#provider\_helm) | >= 3.0.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | >= 3.0 |
 
 ## Modules
 
