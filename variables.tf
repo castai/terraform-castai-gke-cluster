@@ -328,3 +328,9 @@ variable "install_omni" {
   default     = false
   description = "Optional flag for installation of Omni product"
 }
+
+variable "overwrite_existing_helm_releases" {
+  type        = bool
+  default     = false
+  description = "Optional flag to enable upgrade_install on all CAST AI Helm releases. When set to true, Helm will upgrade an existing release instead of failing with 'cannot re-use a name that is still in use'. Useful when Helm releases already exist in the cluster but are not tracked in Terraform state."
+}
