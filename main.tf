@@ -154,9 +154,11 @@ resource "castai_node_template" "this" {
         for_each = flatten([lookup(constraints.value, "dedicated_node_affinity", [])])
 
         content {
-          name           = try(dedicated_node_affinity.value.name, null)
-          az_name        = try(dedicated_node_affinity.value.az_name, null)
-          instance_types = try(dedicated_node_affinity.value.instance_types, [])
+          name              = try(dedicated_node_affinity.value.name, null)
+          az_name           = try(dedicated_node_affinity.value.az_name, null)
+          instance_types    = try(dedicated_node_affinity.value.instance_types, [])
+          cpus_per_gpu      = try(dedicated_node_affinity.value.cpus_per_gpu, null)
+          min_gpus_per_node = try(dedicated_node_affinity.value.min_gpus_per_node, null)
 
           dynamic "affinity" {
             for_each = flatten([lookup(dedicated_node_affinity.value, "affinity", [])])
