@@ -158,6 +158,7 @@ resource "castai_node_template" "this" {
           az_name           = try(dedicated_node_affinity.value.az_name, null)
           instance_types    = try(dedicated_node_affinity.value.instance_types, [])
           cpus_per_gpu      = try(dedicated_node_affinity.value.cpus_per_gpu, null)
+          max_cpu           = try(dedicated_node_affinity.value.max_cpu, null)
           min_gpus_per_node = try(dedicated_node_affinity.value.min_gpus_per_node, null)
 
           dynamic "affinity" {
