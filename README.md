@@ -547,6 +547,21 @@ spec:
             memory: "4Gi"
 ```
 
+Migrating from 10.x.x to 11.x.x
+-------------------------------
+
+Version 11.0.0 introduces the ability to use the Cast AI umbrella Helm chart instead of the standalone Helm charts.
+This behavior is controlled with the new `umbrella_enabled` variable. It is set to `false` by default and the umbrella
+Helm chart can be enabled by setting it to `true`.
+
+> [!CAUTION]
+> You MUST migrate to the umbrella Helm chart while using the 11.x.x version of this module by following the
+> instructions at https://github.com/castai/terraform-provider-castai/blob/master/docs/umbrella-migration/README.md
+
+A future major release (potentially the next one) will drop the support for the standalone Helm releases and will make
+the controlled migration impossible. If you want to move from 10.x.x or older to a version above 11.x.x, **you must
+first move to 11.x.x and complete the migration** by following the instructions above!
+
 # Examples
 
 Usage examples are located in [terraform provider repo](https://github.com/castai/terraform-provider-castai/tree/master/examples/gke)
