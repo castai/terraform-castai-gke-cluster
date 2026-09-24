@@ -547,6 +547,21 @@ spec:
             memory: "4Gi"
 ```
 
+Migrating from 10.x.x to 11.x.x
+-------------------------------
+
+Version 11.0.0 introduces the ability to use the Cast AI umbrella Helm chart instead of the standalone Helm charts.
+This behavior is controlled with the new `umbrella_enabled` variable. It is set to `false` by default and the umbrella
+Helm chart can be enabled by setting it to `true`.
+
+> [!CAUTION]
+> You MUST migrate to the umbrella Helm chart while using the 11.x.x version of this module by following the
+> instructions at https://github.com/castai/terraform-provider-castai/blob/master/docs/umbrella-migration/README.md
+
+A future major release (potentially the next one) will drop the support for the standalone Helm releases and will make
+the controlled migration impossible. If you want to move from 10.x.x or older to a version above 11.x.x, **you must
+first move to 11.x.x and complete the migration** by following the instructions above!
+
 # Examples
 
 Usage examples are located in [terraform provider repo](https://github.com/castai/terraform-provider-castai/tree/master/examples/gke)
@@ -604,6 +619,8 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | [helm_release.castai_pod_pinner](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_pod_pinner_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_spot_handler](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.castai_umbrella_cast_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
+| [helm_release.castai_umbrella_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_workload_autoscaler](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_workload_autoscaler_exporter](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [helm_release.castai_workload_autoscaler_exporter_self_managed](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
@@ -665,9 +682,11 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="input_self_managed"></a> [self\_managed](#input\_self\_managed) | Whether CAST AI components' upgrades are managed by a customer; by default upgrades are managed CAST AI central system. WARNING: changing this after the module was created is not supported. | `bool` | `false` | no |
 | <a name="input_spot_handler_values"></a> [spot\_handler\_values](#input\_spot\_handler\_values) | List of YAML formatted string values for spot-handler helm chart | `list(string)` | `[]` | no |
 | <a name="input_spot_handler_version"></a> [spot\_handler\_version](#input\_spot\_handler\_version) | Version of castai-spot-handler helm chart. Default latest | `string` | `null` | no |
+| <a name="input_umbrella_enabled"></a> [umbrella\_enabled](#input\_umbrella\_enabled) | Use Cast AI Umbrella Helm chart instead of standalone charts. See https://github.com/castai/terraform-provider-castai/tree/master/docs/umbrella-migration | `bool` | `false` | no |
 | <a name="input_wait_for_cluster_ready"></a> [wait\_for\_cluster\_ready](#input\_wait\_for\_cluster\_ready) | Wait for cluster to be ready before finishing the module execution, this option requires `castai_api_token` to be set | `bool` | `false` | no |
 | <a name="input_workload_autoscaler_exporter_values"></a> [workload\_autoscaler\_exporter\_values](#input\_workload\_autoscaler\_exporter\_values) | List of YAML formatted string with castai-workload-autoscaler-exporter values | `list(string)` | `[]` | no |
 | <a name="input_workload_autoscaler_exporter_version"></a> [workload\_autoscaler\_exporter\_version](#input\_workload\_autoscaler\_exporter\_version) | Version of castai-workload-autoscaler-exporter helm chart. Default latest | `string` | `null` | no |
+| <a name="input_workload_autoscaler_keep_crds"></a> [workload\_autoscaler\_keep\_crds](#input\_workload\_autoscaler\_keep\_crds) | Install workload-autoscaler Helm Release in "keep CRDs" mode, so even it it's uninstalled, its CRDs and CRs will be retained. Necessary during migrating to the Cast AI Umbrella Helm chart. | `bool` | `false` | no |
 | <a name="input_workload_autoscaler_values"></a> [workload\_autoscaler\_values](#input\_workload\_autoscaler\_values) | List of YAML formatted string with cluster-workload-autoscaler values | `list(string)` | `[]` | no |
 | <a name="input_workload_autoscaler_version"></a> [workload\_autoscaler\_version](#input\_workload\_autoscaler\_version) | Version of castai-workload-autoscaler helm chart. Default latest | `string` | `null` | no |
 | <a name="input_workload_custom_metrics_data_sources"></a> [workload\_custom\_metrics\_data\_sources](#input\_workload\_custom\_metrics\_data\_sources) | Map of workload custom metrics data sources to create | `any` | `{}` | no |
