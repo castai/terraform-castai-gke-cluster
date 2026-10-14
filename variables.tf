@@ -68,7 +68,28 @@ variable "gke_cluster_location" {
 
 variable "gke_credentials" {
   type        = string
-  description = "Optional GCP Service account credentials.json"
+  description = "DEPRECATED: use `credentials` instead. Optional GCP Service account credentials.json used for onboarding. Conflicts with `credentials`."
+  default     = null
+}
+
+variable "credentials" {
+  type = object({
+    target_service_account = string
+    castai_service_account = string
+  })
+  description = <<-EOT
+    GKE cluster credentials for service account impersonation onboarding.
+    `target_service_account` is the service account email in the target GCP project that CAST AI impersonates.
+    `castai_service_account` is the CAST AI service account email, e.g. the `email` attribute of
+    data.castai_impersonation_service_account with cluster_type = "gke".
+    Both fields must be set together. Conflicts with `gke_credentials`.
+  EOT
+  default     = null
+
+  validation {
+    condition     = (var.gke_credentials != null) != (var.credentials != null)
+    error_message = "Exactly one of gke_credentials or credentials must be set."
+  }
 }
 
 variable "castai_components_labels" {
