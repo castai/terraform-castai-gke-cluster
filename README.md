@@ -24,7 +24,9 @@ A module to connect a GKE cluster to CAST AI.
 
 Requires `castai/castai` and `hashicorp/google` providers to be configured.
 
-For Phase 2 onboarding credentials from `terraform-gke-iam` are required
+For Phase 2 onboarding credentials from `terraform-gke-iam` are required — either as the legacy
+`gke_credentials` service account key, or via GKE service account impersonation using the
+`credentials` block (see below).
 
 ```hcl
 module "castai_gke_cluster" {
@@ -273,6 +275,45 @@ module "castai_gke_cluster" {
         ]
       }
     }
+  }
+}
+```
+
+### Onboarding with service account impersonation
+
+Instead of a service account key, the cluster can be onboarded using GKE service account
+impersonation. `castai_service_account` is the CAST AI service account that will impersonate
+the target service account — grant it the `roles/iam.serviceAccountTokenCreator` role on the
+target service account. The target service account also needs the CAST AI GKE permissions
+(see `castai_gke_user_policies` in the provider).
+
+```hcl
+data "castai_impersonation_service_account" "gke" {
+  provider_type = "gke"
+}
+
+resource "google_service_account" "castai" {
+  account_id   = "castai-gke"
+  display_name = "CAST AI GKE cluster"
+  project      = var.project_id
+}
+
+resource "google_service_account_iam_member" "token_creator" {
+  service_account_id = google_service_account.castai.name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:${data.castai_impersonation_service_account.gke.email}"
+}
+
+module "castai_gke_cluster" {
+  source = "castai/gke-cluster/castai"
+
+  project_id           = var.project_id
+  gke_cluster_name     = var.cluster_name
+  gke_cluster_location = module.gke.location
+
+  credentials = {
+    target_service_account  = google_service_account.castai.email
+    castai_service_account = data.castai_impersonation_service_account.gke.email
   }
 }
 ```
@@ -645,6 +686,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="input_castware_api_url"></a> [castware\_api\_url](#input\_castware\_api\_url) | URL of CAST AI API to be used from within the cluster by Cast AI applications (Castware). If left empty, `api_url` will be used within the cluster. | `string` | `""` | no |
 | <a name="input_cluster_controller_values"></a> [cluster\_controller\_values](#input\_cluster\_controller\_values) | List of YAML formatted string values for cluster-controller helm chart | `list(string)` | `[]` | no |
 | <a name="input_cluster_controller_version"></a> [cluster\_controller\_version](#input\_cluster\_controller\_version) | Version of castai-cluster-controller helm chart. Default latest | `string` | `null` | no |
+| <a name="input_credentials"></a> [credentials](#input\_credentials) | GKE cluster credentials for service account impersonation onboarding.<br/>`target_service_account` is the service account email in the target GCP project that CAST AI impersonates.<br/>`castai_service_account` is the CAST AI service account email, e.g. the `email` attribute of<br/>data.castai\_impersonation\_service\_account with cluster\_type = "gke".<br/>Both fields must be set together. Conflicts with `gke_credentials`. | <pre>object({<br/>    target_service_account = string<br/>    castai_service_account = string<br/>  })</pre> | `null` | no |
 | <a name="input_default_node_configuration"></a> [default\_node\_configuration](#input\_default\_node\_configuration) | ID of the default node configuration | `string` | `""` | no |
 | <a name="input_default_node_configuration_name"></a> [default\_node\_configuration\_name](#input\_default\_node\_configuration\_name) | Name of the default node configuration | `string` | `""` | no |
 | <a name="input_delete_nodes_on_disconnect"></a> [delete\_nodes\_on\_disconnect](#input\_delete\_nodes\_on\_disconnect) | Optionally delete Cast AI created nodes when the cluster is destroyed | `bool` | `false` | no |
@@ -654,7 +696,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="input_evictor_version"></a> [evictor\_version](#input\_evictor\_version) | Version of castai-evictor chart. Default latest | `string` | `null` | no |
 | <a name="input_gke_cluster_location"></a> [gke\_cluster\_location](#input\_gke\_cluster\_location) | Location of the cluster to be connected to CAST AI. Can be region or zone for zonal clusters | `string` | n/a | yes |
 | <a name="input_gke_cluster_name"></a> [gke\_cluster\_name](#input\_gke\_cluster\_name) | Name of the cluster to be connected to CAST AI. | `string` | n/a | yes |
-| <a name="input_gke_credentials"></a> [gke\_credentials](#input\_gke\_credentials) | Optional GCP Service account credentials.json | `string` | n/a | yes |
+| <a name="input_gke_credentials"></a> [gke\_credentials](#input\_gke\_credentials) | DEPRECATED: use `credentials` instead. Optional GCP Service account credentials.json used for onboarding. Conflicts with `credentials`. | `string` | `null` | no |
 | <a name="input_grpc_url"></a> [grpc\_url](#input\_grpc\_url) | gRPC endpoint used by pod-pinner | `string` | `"grpc.cast.ai:443"` | no |
 | <a name="input_install_ai_optimizer"></a> [install\_ai\_optimizer](#input\_install\_ai\_optimizer) | Optional flag for installation of AI Optimizer (https://docs.cast.ai/docs/getting-started-ai) | `bool` | `false` | no |
 | <a name="input_install_live"></a> [install\_live](#input\_install\_live) | Optional flag for installation of CAST AI Live (https://docs.cast.ai/docs/clm-getting-started) | `bool` | `true` | no |
