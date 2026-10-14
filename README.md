@@ -289,7 +289,7 @@ target service account. The target service account also needs the CAST AI GKE pe
 
 ```hcl
 data "castai_impersonation_service_account" "gke" {
-  cluster_type = "gke"
+  provider_type = "gke"
 }
 
 resource "google_service_account" "castai" {
