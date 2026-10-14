@@ -81,7 +81,7 @@ variable "credentials" {
     GKE cluster credentials for service account impersonation onboarding.
     `target_service_account` is the service account email in the target GCP project that CAST AI impersonates.
     `castai_service_account` is the CAST AI service account email, e.g. the `email` attribute of
-    data.castai_impersonation_service_account with cluster_type = "gke".
+    data.castai_impersonation_service_account with provider_type = "gke".
     Both fields must be set together. Conflicts with `gke_credentials`.
   EOT
   default     = null
