@@ -68,27 +68,36 @@ variable "gke_cluster_location" {
 
 variable "gke_credentials" {
   type        = string
-  description = "DEPRECATED: use `credentials` instead. Optional GCP Service account credentials.json used for onboarding. Conflicts with `credentials`."
+  description = "DEPRECATED: use `target_service_account_email` and `castai_service_account_email` instead. Optional GCP Service account credentials.json used for onboarding. Conflicts with the impersonation email variables."
   default     = null
 }
 
-variable "credentials" {
-  type = object({
-    target_service_account = string
-    castai_service_account = string
-  })
+variable "target_service_account_email" {
+  type        = string
   description = <<-EOT
-    GKE cluster credentials for service account impersonation onboarding.
-    `target_service_account` is the service account email in the target GCP project that CAST AI impersonates.
-    `castai_service_account` is the CAST AI service account email, e.g. the `email` attribute of
-    data.castai_impersonation_service_account with provider_type = "gke".
-    Both fields must be set together. Conflicts with `gke_credentials`.
+    Service account email in the target GCP project that CAST AI impersonates.
+    Must be set together with `castai_service_account_email`. Conflicts with `gke_credentials`.
   EOT
   default     = null
 
   validation {
-    condition     = (var.gke_credentials != null) != (var.credentials != null)
-    error_message = "Exactly one of gke_credentials or credentials must be set."
+    condition     = (var.target_service_account_email == null) == (var.castai_service_account_email == null)
+    error_message = "`target_service_account_email` and `castai_service_account_email` must be set together."
+  }
+}
+
+variable "castai_service_account_email" {
+  type        = string
+  description = <<-EOT
+    CAST AI service account email used to access the target project, e.g. the `email` attribute of
+    data.castai_impersonation_service_account with provider_type = "gke".
+    Must be set together with `target_service_account_email`. Conflicts with `gke_credentials`.
+  EOT
+  default     = null
+
+  validation {
+    condition     = (var.gke_credentials != null) != (var.castai_service_account_email != null)
+    error_message = "Exactly one onboarding method must be configured: either `gke_credentials` or the impersonation emails (`target_service_account_email` and `castai_service_account_email`)."
   }
 }
 
