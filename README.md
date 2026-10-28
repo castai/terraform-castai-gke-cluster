@@ -287,6 +287,10 @@ the target service account — grant it the `roles/iam.serviceAccountTokenCreato
 target service account. The target service account also needs the CAST AI GKE permissions
 (see `castai_gke_user_policies` in the provider).
 
+Opting in to impersonation is available today - it does not have to wait for the
+`castai/gke-iam/castai` module to change its default authentication method. Using that module is
+not mandatory either: as shown below, the required GCP IAM resources can also be managed directly.
+
 ```hcl
 data "castai_impersonation_service_account" "gke" {
   provider_type = "gke"
@@ -315,6 +319,30 @@ module "castai_gke_cluster" {
   castai_service_account_email = data.castai_impersonation_service_account.gke.email
 }
 ```
+
+The switch from `gke_credentials` to impersonation is prepared stepwise together with the
+`castai/gke-iam/castai` module. Since version 0.6.x that module pre-provisions the resources
+required for impersonation (the `roles/iam.serviceAccountTokenCreator` binding and the
+`castai_impersonation_service_account` data source read) while the cluster still onboards with the
+service account key - controlled by its `authentication_method_migration` variable. The switch can
+be made at any time - the IAM module outputs are populated while it is still preparing: remove
+`gke_credentials` here and pass the two IAM module outputs instead:
+
+```hcl
+module "castai_gke_cluster" {
+  source = "castai/gke-cluster/castai"
+
+  # ...
+
+  target_service_account_email = module.castai_gke_iam.target_service_account_email
+  castai_service_account_email = module.castai_gke_iam.castai_service_account_email
+}
+```
+
+Setting `authentication_method = "impersonation"` in the IAM module - in the same apply or a later
+one - stops it from creating the service account key; until then, the key is simply no longer used
+for onboarding. A future version of that module will change the default authentication method to
+`impersonation`.
 
 Migrating from 3.x.x to 4.x.x
 ---------------------------
@@ -611,7 +639,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | Name | Version |
 | ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 8.57.0 |
+| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 9.14.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.1.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.0 |
@@ -620,7 +648,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 | ---- | ------- |
-| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 8.57.0 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 9.14.0 |
 | <a name="provider_google"></a> [google](#provider\_google) | >= 2.49 |
 | <a name="provider_helm"></a> [helm](#provider\_helm) | >= 3.1.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | >= 3.0 |
