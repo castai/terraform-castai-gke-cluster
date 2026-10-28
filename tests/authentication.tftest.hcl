@@ -108,15 +108,8 @@ run "service_account_key_onboarding" {
     error_message = "Cluster registration should use the service account key credentials"
   }
 
-  assert {
-    condition     = castai_gke_cluster.castai_cluster.target_service_account_email == null
-    error_message = "target_service_account_email should be null for service account key onboarding"
-  }
-
-  assert {
-    condition     = castai_gke_cluster.castai_cluster.castai_service_account_email == null
-    error_message = "castai_service_account_email should be null for service account key onboarding"
-  }
+  # target_service_account_email and castai_service_account_email are Optional+Computed since provider 9.15.0 (#847)
+  # mock_provider fills them, so they can't be asserted null.
 }
 
 run "impersonation_onboarding" {

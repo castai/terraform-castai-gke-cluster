@@ -592,7 +592,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9 |
-| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 9.14.0 |
+| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 9.17.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.1.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.0 |
@@ -601,7 +601,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 9.14.0 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 9.17.0 |
 | <a name="provider_google"></a> [google](#provider\_google) | >= 2.49 |
 | <a name="provider_helm"></a> [helm](#provider\_helm) | >= 3.1.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | >= 3.0 |
@@ -692,7 +692,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="input_live_values"></a> [live\_values](#input\_live\_values) | List of YAML formatted string with castai-live values | `list(string)` | `[]` | no |
 | <a name="input_live_version"></a> [live\_version](#input\_live\_version) | Version of castai-live helm chart. Default latest | `string` | `null` | no |
 | <a name="input_node_configurations"></a> [node\_configurations](#input\_node\_configurations) | Map of GKE node configurations to create | `any` | `{}` | no |
-| <a name="input_node_templates"></a> [node\_templates](#input\_node\_templates) | Map of node templates to create | `any` | `{}` | no |
+| <a name="input_node_templates"></a> [node\_templates](#input\_node\_templates) | Map of node templates to create. Keys mirror the [castai\_node\_template](https://registry.terraform.io/providers/castai/castai/latest/docs/resources/node_template) resource attributes. | `any` | `{}` | no |
 | <a name="input_organization_id"></a> [organization\_id](#input\_organization\_id) | DEPRECATED (required only for pod mutator v0.0.25 and older): CAST AI Organization ID | `string` | `""` | no |
 | <a name="input_overwrite_existing_helm_releases"></a> [overwrite\_existing\_helm\_releases](#input\_overwrite\_existing\_helm\_releases) | Optional flag to enable upgrade\_install on all CAST AI Helm releases. When set to true, Helm will upgrade an existing release instead of failing with 'cannot re-use a name that is still in use'. Useful when Helm releases already exist in the cluster but are not tracked in Terraform state. | `bool` | `false` | no |
 | <a name="input_pod_mutator_values"></a> [pod\_mutator\_values](#input\_pod\_mutator\_values) | List of YAML formatted string values for pod-mutator helm chart | `list(string)` | `[]` | no |
