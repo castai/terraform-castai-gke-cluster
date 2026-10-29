@@ -279,46 +279,17 @@ module "castai_gke_cluster" {
 }
 ```
 
-### Onboarding with service account impersonation
+Impersonation preparation in 11.1.x
+-----------------------------------
 
-Instead of a service account key, the cluster can be onboarded using GKE service account
-impersonation. `castai_service_account_email` is the CAST AI service account that will impersonate
-the target service account — grant it the `roles/iam.serviceAccountTokenCreator` role on the
-target service account. The target service account also needs the CAST AI GKE permissions
-(see `castai_gke_user_policies` in the provider).
-
-Opting in to impersonation is available today - it does not have to wait for the
-`castai/gke-iam/castai` module to change its default authentication method. Using that module is
-not mandatory either: as shown below, the required GCP IAM resources can also be managed directly.
-
-```hcl
-data "castai_impersonation_service_account" "gke" {
-  provider_type = "gke"
-}
-
-resource "google_service_account" "castai" {
-  account_id   = "castai-gke"
-  display_name = "CAST AI GKE cluster"
-  project      = var.project_id
-}
-
-resource "google_service_account_iam_member" "token_creator" {
-  service_account_id = google_service_account.castai.name
-  role               = "roles/iam.serviceAccountTokenCreator"
-  member             = "serviceAccount:${data.castai_impersonation_service_account.gke.email}"
-}
-
-module "castai_gke_cluster" {
-  source = "castai/gke-cluster/castai"
-
-  project_id           = var.project_id
-  gke_cluster_name     = var.cluster_name
-  gke_cluster_location = module.gke.location
-
-  target_service_account_email = google_service_account.castai.email
-  castai_service_account_email = data.castai_impersonation_service_account.gke.email
-}
-```
+Version 11.1.x supports onboarding the cluster via GKE service account impersonation instead of
+the deprecated `gke_credentials` service account key: set `target_service_account_email` (the
+service account in the GCP project that CAST AI impersonates) and `castai_service_account_email`
+(the CAST AI service account that performs the impersonation, e.g. the `email` attribute of
+`data.castai_impersonation_service_account` with `provider_type = "gke"`). The CAST AI service
+account needs the `roles/iam.serviceAccountTokenCreator` role on the target service account, and
+the target service account needs the CAST AI GKE permissions (see `castai_gke_user_policies` in
+the provider). 
 
 The switch from `gke_credentials` to impersonation is prepared stepwise together with the
 `castai/gke-iam/castai` module. Since version 0.6.x that module pre-provisions the resources
@@ -326,23 +297,15 @@ required for impersonation (the `roles/iam.serviceAccountTokenCreator` binding a
 `castai_impersonation_service_account` data source read) while the cluster still onboards with the
 service account key - controlled by its `authentication_method_migration` variable. The switch can
 be made at any time - the IAM module outputs are populated while it is still preparing: remove
-`gke_credentials` here and pass the two IAM module outputs instead:
+`gke_credentials` and pass the two module outputs (`target_service_account_email` and
+`castai_service_account_email`). Setting `authentication_method` to `impersonation` in the IAM
+module - in the same apply or a later one - stops it from creating the service account key; until
+then, the key is simply no longer used for onboarding. A future version of that module will change
+the default authentication method to `impersonation`.
 
-```hcl
-module "castai_gke_cluster" {
-  source = "castai/gke-cluster/castai"
-
-  # ...
-
-  target_service_account_email = module.castai_gke_iam.target_service_account_email
-  castai_service_account_email = module.castai_gke_iam.castai_service_account_email
-}
-```
-
-Setting `authentication_method = "impersonation"` in the IAM module - in the same apply or a later
-one - stops it from creating the service account key; until then, the key is simply no longer used
-for onboarding. A future version of that module will change the default authentication method to
-`impersonation`.
+Using the `castai/gke-iam/castai` module is not mandatory - the required GCP IAM resources can also
+be managed directly. A complete example is available at
+[examples/gke/gke_impersonate](https://github.com/castai/terraform-provider-castai/tree/master/examples/gke/gke_impersonate).
 
 Migrating from 3.x.x to 4.x.x
 ---------------------------
