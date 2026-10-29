@@ -68,7 +68,7 @@ variable "gke_cluster_location" {
 
 variable "gke_credentials" {
   type        = string
-  description = "DEPRECATED: use `target_service_account_email` and `castai_service_account_email` instead. Optional GCP Service account credentials.json used for onboarding. Conflicts with the impersonation email variables."
+  description = "DEPRECATED: use `target_service_account_email` and `castai_service_account_email` instead. Optional GCP Service account credentials.json used for onboarding. Exactly one of `gke_credentials` or the impersonation email variables must be set."
   default     = null
 }
 
@@ -76,7 +76,8 @@ variable "target_service_account_email" {
   type        = string
   description = <<-EOT
     Service account email in the target GCP project that CAST AI impersonates.
-    Must be set together with `castai_service_account_email`. Conflicts with `gke_credentials`.
+    Must be set together with `castai_service_account_email`. Exactly one of `gke_credentials`
+    or the impersonation email variables must be set.
   EOT
   default     = null
 
@@ -91,7 +92,8 @@ variable "castai_service_account_email" {
   description = <<-EOT
     CAST AI service account email used to access the target project, e.g. the `email` attribute of
     data.castai_impersonation_service_account with provider_type = "gke".
-    Must be set together with `target_service_account_email`. Conflicts with `gke_credentials`.
+    Must be set together with `target_service_account_email`. Exactly one of `gke_credentials`
+    or the impersonation email variables must be set.
   EOT
   default     = null
 
