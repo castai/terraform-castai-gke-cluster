@@ -96,7 +96,7 @@ run "onboarding_method_required" {
   ]
 }
 
-run "valid_gke_credentials_only" {
+run "service_account_key_onboarding" {
   command = plan
 
   variables {
@@ -104,12 +104,22 @@ run "valid_gke_credentials_only" {
   }
 
   assert {
-    condition     = var.gke_credentials == "test-credentials-json"
-    error_message = "Should accept gke_credentials alone as valid onboarding configuration"
+    condition     = castai_gke_cluster.castai_cluster.credentials_json == "test-credentials-json"
+    error_message = "Cluster registration should use the service account key credentials"
+  }
+
+  assert {
+    condition     = castai_gke_cluster.castai_cluster.target_service_account_email == null
+    error_message = "target_service_account_email should be null for service account key onboarding"
+  }
+
+  assert {
+    condition     = castai_gke_cluster.castai_cluster.castai_service_account_email == null
+    error_message = "castai_service_account_email should be null for service account key onboarding"
   }
 }
 
-run "valid_impersonation_emails_only" {
+run "impersonation_onboarding" {
   command = plan
 
   variables {
@@ -118,7 +128,17 @@ run "valid_impersonation_emails_only" {
   }
 
   assert {
-    condition     = var.target_service_account_email != null && var.castai_service_account_email != null
-    error_message = "Should accept the impersonation emails alone as valid onboarding configuration"
+    condition     = castai_gke_cluster.castai_cluster.credentials_json == null
+    error_message = "credentials_json should be null for impersonation onboarding"
+  }
+
+  assert {
+    condition     = castai_gke_cluster.castai_cluster.target_service_account_email == "castai-gke-tf-abc12345@test-project.iam.gserviceaccount.com"
+    error_message = "target_service_account_email should be passed to the cluster registration"
+  }
+
+  assert {
+    condition     = castai_gke_cluster.castai_cluster.castai_service_account_email == "castai-gke-impersonator@castai-organization.iam.gserviceaccount.com"
+    error_message = "castai_service_account_email should be passed to the cluster registration"
   }
 }
