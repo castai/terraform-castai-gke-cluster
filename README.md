@@ -289,23 +289,13 @@ service account in the GCP project that CAST AI impersonates) and `castai_servic
 `data.castai_impersonation_service_account` with `provider_type = "gke"`). The CAST AI service
 account needs the `roles/iam.serviceAccountTokenCreator` role on the target service account, and
 the target service account needs the CAST AI GKE permissions (see `castai_gke_user_policies` in
-the provider). 
+the provider).
 
-The switch from `gke_credentials` to impersonation is prepared stepwise together with the
-`castai/gke-iam/castai` module. Since version 0.6.x that module pre-provisions the resources
-required for impersonation (the `roles/iam.serviceAccountTokenCreator` binding and the
-`castai_impersonation_service_account` data source read) while the cluster still onboards with the
-service account key - controlled by its `authentication_method_migration` variable. The switch can
-be made at any time - the IAM module outputs are populated while it is still preparing: remove
-`gke_credentials` and pass the two module outputs (`target_service_account_email` and
-`castai_service_account_email`). Setting `authentication_method` to `impersonation` in the IAM
-module - in the same apply or a later one - stops it from creating the service account key; until
-then, the key is simply no longer used for onboarding. A future version of that module will change
-the default authentication method to `impersonation`.
+The `castai/gke-iam/castai` module can provision these GCP IAM resources and exposes both values
+as outputs; using it is not mandatory - the resources can also be managed directly. See its README
+for the stepwise migration from service account key to impersonation.
 
-Using the `castai/gke-iam/castai` module is not mandatory - the required GCP IAM resources can also
-be managed directly. A complete example is available at
-[examples/gke/gke_impersonate](https://github.com/castai/terraform-provider-castai/tree/master/examples/gke/gke_impersonate).
+A complete example is available at [examples/gke/gke_impersonate](https://github.com/castai/terraform-provider-castai/tree/master/examples/gke/gke_impersonate).
 
 Migrating from 3.x.x to 4.x.x
 ---------------------------
