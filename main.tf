@@ -4,6 +4,9 @@ resource "castai_gke_cluster" "castai_cluster" {
   name                       = var.gke_cluster_name
   delete_nodes_on_disconnect = var.delete_nodes_on_disconnect
   credentials_json           = var.gke_credentials
+
+  target_service_account_email = var.target_service_account_email
+  castai_service_account_email = var.castai_service_account_email
 }
 
 resource "castai_node_configuration" "this" {

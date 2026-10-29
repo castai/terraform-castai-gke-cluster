@@ -15,7 +15,7 @@ Website: https://www.cast.ai
 Requirements
 ------------
 
-- [Terraform](https://www.terraform.io/downloads.html) 0.13+
+- [Terraform](https://www.terraform.io/downloads.html) 1.9+
 
 Using the module
 ------------
@@ -24,7 +24,9 @@ A module to connect a GKE cluster to CAST AI.
 
 Requires `castai/castai` and `hashicorp/google` providers to be configured.
 
-For Phase 2 onboarding credentials from `terraform-gke-iam` are required
+For Phase 2 onboarding credentials from `terraform-gke-iam` are required — either as the legacy
+`gke_credentials` service account key, or via GKE service account impersonation using the
+`target_service_account_email` and `castai_service_account_email` variables (see below).
 
 ```hcl
 module "castai_gke_cluster" {
@@ -276,6 +278,24 @@ module "castai_gke_cluster" {
   }
 }
 ```
+
+Impersonation preparation in 11.1.x
+-----------------------------------
+
+Version 11.1.x supports onboarding the cluster via GKE service account impersonation instead of
+the deprecated `gke_credentials` service account key: set `target_service_account_email` (the
+service account in the GCP project that CAST AI impersonates) and `castai_service_account_email`
+(the CAST AI service account that performs the impersonation, e.g. the `email` attribute of
+`data.castai_impersonation_service_account` with `provider_type = "gke"`). The CAST AI service
+account needs the `roles/iam.serviceAccountTokenCreator` role on the target service account, and
+the target service account needs the CAST AI GKE permissions (see `castai_gke_user_policies` in
+the provider).
+
+The `castai/gke-iam/castai` module can provision these GCP IAM resources and exposes both values
+as outputs; using it is not mandatory - the resources can also be managed directly. See its README
+for the stepwise migration from service account key to impersonation.
+
+A complete example is available at [examples/gke/gke_impersonate](https://github.com/castai/terraform-provider-castai/tree/master/examples/gke/gke_impersonate).
 
 Migrating from 3.x.x to 4.x.x
 ---------------------------
@@ -571,8 +591,8 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
-| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 8.57.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9 |
+| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 9.14.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.1.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.0 |
@@ -581,7 +601,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 8.57.0 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 9.14.0 |
 | <a name="provider_google"></a> [google](#provider\_google) | >= 2.49 |
 | <a name="provider_helm"></a> [helm](#provider\_helm) | >= 3.1.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | >= 3.0 |
@@ -642,6 +662,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="input_castai_api_token"></a> [castai\_api\_token](#input\_castai\_api\_token) | Optional CAST AI API token created in console.cast.ai API Access keys section. Used only when `wait_for_cluster_ready` is set to true | `string` | `""` | no |
 | <a name="input_castai_components_labels"></a> [castai\_components\_labels](#input\_castai\_components\_labels) | Optional additional Kubernetes labels for CAST AI pods | `map(any)` | `{}` | no |
 | <a name="input_castai_components_sets"></a> [castai\_components\_sets](#input\_castai\_components\_sets) | Optional additional 'set' configurations for every CAST AI Helm release. | `map(string)` | `{}` | no |
+| <a name="input_castai_service_account_email"></a> [castai\_service\_account\_email](#input\_castai\_service\_account\_email) | CAST AI service account email used to access the target project, e.g. the `email` attribute of<br/>data.castai\_impersonation\_service\_account with provider\_type = "gke".<br/>Must be set together with `target_service_account_email`. Conflicts with `gke_credentials`. | `string` | `null` | no |
 | <a name="input_castware_api_url"></a> [castware\_api\_url](#input\_castware\_api\_url) | URL of CAST AI API to be used from within the cluster by Cast AI applications (Castware). If left empty, `api_url` will be used within the cluster. | `string` | `""` | no |
 | <a name="input_cluster_controller_values"></a> [cluster\_controller\_values](#input\_cluster\_controller\_values) | List of YAML formatted string values for cluster-controller helm chart | `list(string)` | `[]` | no |
 | <a name="input_cluster_controller_version"></a> [cluster\_controller\_version](#input\_cluster\_controller\_version) | Version of castai-cluster-controller helm chart. Default latest | `string` | `null` | no |
@@ -654,7 +675,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="input_evictor_version"></a> [evictor\_version](#input\_evictor\_version) | Version of castai-evictor chart. Default latest | `string` | `null` | no |
 | <a name="input_gke_cluster_location"></a> [gke\_cluster\_location](#input\_gke\_cluster\_location) | Location of the cluster to be connected to CAST AI. Can be region or zone for zonal clusters | `string` | n/a | yes |
 | <a name="input_gke_cluster_name"></a> [gke\_cluster\_name](#input\_gke\_cluster\_name) | Name of the cluster to be connected to CAST AI. | `string` | n/a | yes |
-| <a name="input_gke_credentials"></a> [gke\_credentials](#input\_gke\_credentials) | Optional GCP Service account credentials.json | `string` | n/a | yes |
+| <a name="input_gke_credentials"></a> [gke\_credentials](#input\_gke\_credentials) | DEPRECATED: use `target_service_account_email` and `castai_service_account_email` instead. Optional GCP Service account credentials.json used for onboarding. Conflicts with the impersonation email variables. | `string` | `null` | no |
 | <a name="input_grpc_url"></a> [grpc\_url](#input\_grpc\_url) | gRPC endpoint used by pod-pinner | `string` | `"grpc.cast.ai:443"` | no |
 | <a name="input_install_ai_optimizer"></a> [install\_ai\_optimizer](#input\_install\_ai\_optimizer) | Optional flag for installation of AI Optimizer (https://docs.cast.ai/docs/getting-started-ai) | `bool` | `false` | no |
 | <a name="input_install_live"></a> [install\_live](#input\_install\_live) | Optional flag for installation of CAST AI Live (https://docs.cast.ai/docs/clm-getting-started) | `bool` | `true` | no |
@@ -682,6 +703,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="input_self_managed"></a> [self\_managed](#input\_self\_managed) | Whether CAST AI components' upgrades are managed by a customer; by default upgrades are managed CAST AI central system. WARNING: changing this after the module was created is not supported. | `bool` | `false` | no |
 | <a name="input_spot_handler_values"></a> [spot\_handler\_values](#input\_spot\_handler\_values) | List of YAML formatted string values for spot-handler helm chart | `list(string)` | `[]` | no |
 | <a name="input_spot_handler_version"></a> [spot\_handler\_version](#input\_spot\_handler\_version) | Version of castai-spot-handler helm chart. Default latest | `string` | `null` | no |
+| <a name="input_target_service_account_email"></a> [target\_service\_account\_email](#input\_target\_service\_account\_email) | Service account email in the target GCP project that CAST AI impersonates.<br/>Must be set together with `castai_service_account_email`. Conflicts with `gke_credentials`. | `string` | `null` | no |
 | <a name="input_umbrella_enabled"></a> [umbrella\_enabled](#input\_umbrella\_enabled) | Use Cast AI Umbrella Helm chart instead of standalone charts. See https://github.com/castai/terraform-provider-castai/tree/master/docs/umbrella-migration | `bool` | `false` | no |
 | <a name="input_wait_for_cluster_ready"></a> [wait\_for\_cluster\_ready](#input\_wait\_for\_cluster\_ready) | Wait for cluster to be ready before finishing the module execution, this option requires `castai_api_token` to be set | `bool` | `false` | no |
 | <a name="input_workload_autoscaler_exporter_values"></a> [workload\_autoscaler\_exporter\_values](#input\_workload\_autoscaler\_exporter\_values) | List of YAML formatted string with castai-workload-autoscaler-exporter values | `list(string)` | `[]` | no |
