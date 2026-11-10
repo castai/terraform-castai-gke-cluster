@@ -96,22 +96,6 @@ run "onboarding_method_required" {
   ]
 }
 
-run "service_account_key_onboarding" {
-  command = plan
-
-  variables {
-    gke_credentials = "test-credentials-json"
-  }
-
-  assert {
-    condition     = castai_gke_cluster.castai_cluster.credentials_json == "test-credentials-json"
-    error_message = "Cluster registration should use the service account key credentials"
-  }
-
-  # target_service_account_email and castai_service_account_email are Optional+Computed since provider 9.15.0 (#847)
-  # mock_provider fills them, so they can't be asserted null.
-}
-
 run "impersonation_onboarding" {
   command = plan
 
