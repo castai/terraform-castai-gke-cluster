@@ -282,6 +282,9 @@ module "castai_gke_cluster" {
 Impersonation preparation in 11.1.x
 -----------------------------------
 
+> Note: For general information on GKE Impersonation and a step-by-step guide for migrating to it,
+> please refer to https://github.com/castai/terraform-provider-castai/blob/master/docs/impersonation/gke-impersonation.md
+
 Version 11.1.x supports onboarding the cluster via GKE service account impersonation instead of
 the deprecated `gke_credentials` service account key: set `target_service_account_email` (the
 service account in the GCP project that CAST AI impersonates) and `castai_service_account_email`
