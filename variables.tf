@@ -412,3 +412,21 @@ variable "overwrite_existing_helm_releases" {
   default     = false
   description = "Optional flag to enable upgrade_install on all CAST AI Helm releases. When set to true, Helm will upgrade an existing release instead of failing with 'cannot re-use a name that is still in use'. Useful when Helm releases already exist in the cluster but are not tracked in Terraform state."
 }
+
+variable "install_storage_autoscaler" {
+  type        = bool
+  default     = false
+  description = "Optional flag for installation of storage autoscaler (https://docs.cast.ai/docs/storage-introduction)"
+}
+
+variable "storage_autoscaler_version" {
+  description = "Version of castai-storage-autoscaler helm chart. Default latest"
+  type        = string
+  default     = null
+}
+
+variable "storage_autoscaler_values" {
+  description = "List of YAML formatted string values for castai-storage-autoscaler helm chart"
+  type        = list(string)
+  default     = []
+}
