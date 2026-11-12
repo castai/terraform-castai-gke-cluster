@@ -1005,6 +1005,70 @@ resource "helm_release" "castai_kvisor_self_managed" {
   set_sensitive = local.set_sensitive_apikey
 }
 
+resource "helm_release" "castai_storage_autoscaler" {
+  count = local.install_standalone_charts && var.install_storage_autoscaler && !var.self_managed ? 1 : 0
+
+  name             = "castai-storage-autoscaler"
+  repository       = "https://castai.github.io/helm-charts"
+  chart            = "castai-storage-autoscaler"
+  namespace        = "castai-agent"
+  create_namespace = true
+  cleanup_on_fail  = true
+  upgrade_install  = var.overwrite_existing_helm_releases
+  wait             = true
+
+  version = var.storage_autoscaler_version
+  values  = var.storage_autoscaler_values
+
+  lifecycle {
+    ignore_changes = [version]
+  }
+
+  set = concat(
+    local.set_cluster_id,
+    [
+      {
+        name  = "castai.organizationID"
+        value = castai_gke_cluster.castai_cluster.organization_id
+      },
+    ],
+    local.set_apiurl,
+    local.set_components_sets,
+  )
+
+  set_sensitive = local.set_sensitive_apikey
+}
+
+resource "helm_release" "castai_storage_autoscaler_self_managed" {
+  count = local.install_standalone_charts && var.install_storage_autoscaler && var.self_managed ? 1 : 0
+
+  name             = "castai-storage-autoscaler"
+  repository       = "https://castai.github.io/helm-charts"
+  chart            = "castai-storage-autoscaler"
+  namespace        = "castai-agent"
+  create_namespace = true
+  cleanup_on_fail  = true
+  upgrade_install  = var.overwrite_existing_helm_releases
+  wait             = true
+
+  version = var.storage_autoscaler_version
+  values  = var.storage_autoscaler_values
+
+  set = concat(
+    local.set_cluster_id,
+    [
+      {
+        name  = "castai.organizationID"
+        value = castai_gke_cluster.castai_cluster.organization_id
+      },
+    ],
+    local.set_apiurl,
+    local.set_components_sets,
+  )
+
+  set_sensitive = local.set_sensitive_apikey
+}
+
 #---------------------------------------------------#
 # CAST.AI Workload Autoscaler configuration         #
 #---------------------------------------------------#
