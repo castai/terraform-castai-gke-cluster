@@ -75,6 +75,7 @@ resource "castai_node_template" "this" {
   is_enabled                                    = try(each.value.is_enabled, true)
   should_taint                                  = try(each.value.should_taint, true)
   clm_enabled                                   = try(each.value.clm_enabled, false)
+  clm_networking_mode                           = try(each.value.clm_networking_mode, null)
   custom_instances_enabled                      = try(each.value.custom_instances_enabled, false)
   custom_instances_with_extended_memory_enabled = try(each.value.custom_instances_with_extended_memory_enabled, false)
 
