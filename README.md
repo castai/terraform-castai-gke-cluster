@@ -588,7 +588,7 @@ first move to 11.x.x and complete the migration** by following the instructions 
 Migrating from 11.x.x to 12.x.x
 -------------------------------
 
-Version 12.0.0 replaces the deprecated `castai_autoscaler` resource with `castai_autoscaler_policies` and `castai_evictor`. Autoscaler policies and Evictor settings now follow the provider V2 resources and are configured separately. The legacy resource is removed from Terraform state without disabling policies.
+Version 12.0.0 replaces the deprecated `castai_autoscaler` resource with `castai_autoscaler_policies` and `castai_evictor`. Autoscaler policies and Evictor settings now follow the provider V2 resources and are configured separately. The legacy resource is destroyed during migration, preserving its existing behavior of disabling policies.
 
 ### Changed Fields
 
