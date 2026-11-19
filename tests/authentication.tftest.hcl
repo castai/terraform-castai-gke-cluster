@@ -25,7 +25,13 @@ mock_provider "castai" {
     }
   }
 
-  mock_resource "castai_autoscaler" {
+  mock_resource "castai_autoscaler_policies" {
+    defaults = {
+      id = "cccccccc-cccc-cccc-cccc-cccccccccccc"
+    }
+  }
+
+  mock_resource "castai_evictor" {
     defaults = {
       id = "cccccccc-cccc-cccc-cccc-cccccccccccc"
     }
