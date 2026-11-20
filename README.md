@@ -585,10 +585,10 @@ A future major release (potentially the next one) will drop the support for the 
 the controlled migration impossible. If you want to move from 10.x.x or older to a version above 11.x.x, **you must
 first move to 11.x.x and complete the migration** by following the instructions above!
 
-Migrating from 11.x.x to 12.x.x
+Migrating from 12.x.x to 13.x.x
 -------------------------------
 
-Version 12.0.0 replaces the deprecated `castai_autoscaler` resource with `castai_autoscaler_policies` and `castai_evictor`. Autoscaler policies and Evictor settings now follow the provider V2 resources and are configured separately.
+Version 13.0.0 replaces the deprecated `castai_autoscaler` resource with `castai_autoscaler_policies` and `castai_evictor`. Autoscaler policies and Evictor settings now follow the provider V2 resources and are configured separately.
 
 ### Changed Fields
 
