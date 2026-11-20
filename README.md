@@ -585,6 +585,108 @@ A future major release (potentially the next one) will drop the support for the 
 the controlled migration impossible. If you want to move from 10.x.x or older to a version above 11.x.x, **you must
 first move to 11.x.x and complete the migration** by following the instructions above!
 
+Migrating from 12.x.x to 13.x.x
+-------------------------------
+
+Version 13.0.0 replaces the deprecated `castai_autoscaler` resource with `castai_autoscaler_policies` and `castai_evictor`. Autoscaler policies and Evictor settings now follow the provider V2 resources and are configured separately.
+
+### Changed Fields
+
+| Previous `autoscaler_settings` field | Migration path |
+|--------------------------------------|----------------|
+| `is_scoped_mode` | Renamed to `scoped_mode` |
+| `node_templates_partial_matching_enabled` | Moved to `unschedulable_pods.partial_template_matching_enabled` |
+| `node_downscaler.empty_nodes.enabled` | Use `node_downscaler.empty_nodes_enabled` |
+| `node_downscaler.empty_nodes.delay_seconds` | Use `node_downscaler.empty_nodes_delay` as a duration string, for example `"300s"` |
+| `node_downscaler.evictor` | Moved to the top-level `evictor_settings` variable; nested field names remain unchanged |
+| `node_downscaler.enabled` | Removed; use `empty_nodes_enabled` instead |
+
+### Migration Example
+
+Old configuration:
+```hcl
+module "castai-gke-cluster" {
+  source = "castai/gke-cluster/castai"
+
+  autoscaler_settings = {
+    enabled                                 = true
+    is_scoped_mode                          = true
+    node_templates_partial_matching_enabled = false
+
+    unschedulable_pods = {
+      enabled = true
+    }
+
+    cluster_limits = {
+      enabled = true
+      cpu = {
+        min_cores = 1
+        max_cores = 100
+      }
+    }
+
+    node_downscaler = {
+      enabled = true
+
+      empty_nodes = {
+        enabled       = true
+        delay_seconds = 300
+      }
+
+      evictor = {
+        enabled                   = true
+        dry_run                   = false
+        aggressive_mode           = false
+        scoped_mode               = false
+        cycle_interval            = "1m"
+        node_grace_period_minutes = 5
+      }
+    }
+  }
+}
+```
+
+New configuration:
+```hcl
+module "castai-gke-cluster" {
+  source = "castai/gke-cluster/castai"
+
+  autoscaler_settings = {
+    enabled     = true
+    scoped_mode = true
+
+    unschedulable_pods = {
+      enabled                            = true
+      partial_template_matching_enabled = false
+    }
+
+    cluster_limits = {
+      enabled = true
+      cpu = {
+        min_cores = 1
+        max_cores = 100
+      }
+    }
+
+    node_downscaler = {
+      empty_nodes_enabled = true
+      empty_nodes_delay   = "300s"
+    }
+  }
+
+  evictor_settings = {
+    enabled                   = true
+    dry_run                   = false
+    aggressive_mode           = false
+    scoped_mode               = false
+    cycle_interval            = "1m"
+    node_grace_period_minutes = 5
+  }
+}
+```
+
+Autoscaler policies are managed by `castai_autoscaler_policies`. Evictor is managed independently by `castai_evictor` and can be configured without setting `autoscaler_settings`. Other autoscaler policy fields retain their previous structure.
+
 # Examples
 
 Usage examples are located in [terraform provider repo](https://github.com/castai/terraform-provider-castai/tree/master/examples/gke)
@@ -595,7 +697,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9 |
-| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 9.17.0 |
+| <a name="requirement_castai"></a> [castai](#requirement\_castai) | >= 9.22.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | >= 2.49 |
 | <a name="requirement_helm"></a> [helm](#requirement\_helm) | >= 3.1.0 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 3.0 |
@@ -604,7 +706,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Version |
 |------|---------|
-| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 9.17.0 |
+| <a name="provider_castai"></a> [castai](#provider\_castai) | >= 9.22.0 |
 | <a name="provider_google"></a> [google](#provider\_google) | >= 2.49 |
 | <a name="provider_helm"></a> [helm](#provider\_helm) | >= 3.1.0 |
 | <a name="provider_null"></a> [null](#provider\_null) | >= 3.0 |
@@ -619,7 +721,8 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 
 | Name | Type |
 |------|------|
-| [castai_autoscaler.castai_autoscaler_policies](https://registry.terraform.io/providers/castai/castai/latest/docs/resources/autoscaler) | resource |
+| [castai_autoscaler_policies.castai_autoscaler_policies](https://registry.terraform.io/providers/castai/castai/latest/docs/resources/autoscaler_policies) | resource |
+| [castai_evictor.castai_evictor](https://registry.terraform.io/providers/castai/castai/latest/docs/resources/evictor) | resource |
 | [castai_gke_cluster.castai_cluster](https://registry.terraform.io/providers/castai/castai/latest/docs/resources/gke_cluster) | resource |
 | [castai_node_configuration.this](https://registry.terraform.io/providers/castai/castai/latest/docs/resources/node_configuration) | resource |
 | [castai_node_configuration_default.this](https://registry.terraform.io/providers/castai/castai/latest/docs/resources/node_configuration_default) | resource |
@@ -663,7 +766,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="input_ai_optimizer_values"></a> [ai\_optimizer\_values](#input\_ai\_optimizer\_values) | List of YAML formatted string with ai-optimizer values | `list(string)` | `[]` | no |
 | <a name="input_ai_optimizer_version"></a> [ai\_optimizer\_version](#input\_ai\_optimizer\_version) | Version of castai-ai-optimizer helm chart. Default latest | `string` | `null` | no |
 | <a name="input_api_url"></a> [api\_url](#input\_api\_url) | URL of alternative CAST AI API to be used during development or testing | `string` | `"https://api.cast.ai"` | no |
-| <a name="input_autoscaler_settings"></a> [autoscaler\_settings](#input\_autoscaler\_settings) | Optional Autoscaler policy definitions to override current autoscaler settings | `any` | `null` | no |
+| <a name="input_autoscaler_settings"></a> [autoscaler\_settings](#input\_autoscaler\_settings) | Optional policy definitions mapped to the castai\_autoscaler\_policies resource | `any` | `null` | no |
 | <a name="input_castai_api_token"></a> [castai\_api\_token](#input\_castai\_api\_token) | Optional CAST AI API token created in console.cast.ai API Access keys section. Used only when `wait_for_cluster_ready` is set to true | `string` | `""` | no |
 | <a name="input_castai_components_labels"></a> [castai\_components\_labels](#input\_castai\_components\_labels) | Optional additional Kubernetes labels for CAST AI pods | `map(any)` | `{}` | no |
 | <a name="input_castai_components_sets"></a> [castai\_components\_sets](#input\_castai\_components\_sets) | Optional additional 'set' configurations for every CAST AI Helm release. | `map(string)` | `{}` | no |
@@ -676,6 +779,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="input_delete_nodes_on_disconnect"></a> [delete\_nodes\_on\_disconnect](#input\_delete\_nodes\_on\_disconnect) | Optionally delete Cast AI created nodes when the cluster is destroyed | `bool` | `false` | no |
 | <a name="input_evictor_ext_values"></a> [evictor\_ext\_values](#input\_evictor\_ext\_values) | List of YAML formatted string with evictor-ext values | `list(string)` | `[]` | no |
 | <a name="input_evictor_ext_version"></a> [evictor\_ext\_version](#input\_evictor\_ext\_version) | Version of castai-evictor-ext chart. Default latest | `string` | `null` | no |
+| <a name="input_evictor_settings"></a> [evictor\_settings](#input\_evictor\_settings) | Optional Evictor configuration mapped independently to the castai\_evictor resource | `any` | `null` | no |
 | <a name="input_evictor_values"></a> [evictor\_values](#input\_evictor\_values) | List of YAML formatted string values for evictor helm chart | `list(string)` | `[]` | no |
 | <a name="input_evictor_version"></a> [evictor\_version](#input\_evictor\_version) | Version of castai-evictor chart. Default latest | `string` | `null` | no |
 | <a name="input_gke_cluster_location"></a> [gke\_cluster\_location](#input\_gke\_cluster\_location) | Location of the cluster to be connected to CAST AI. Can be region or zone for zonal clusters | `string` | n/a | yes |

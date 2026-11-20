@@ -25,7 +25,13 @@ mock_provider "castai" {
     }
   }
 
-  mock_resource "castai_autoscaler" {
+  mock_resource "castai_autoscaler_policies" {
+    defaults = {
+      id = "cccccccc-cccc-cccc-cccc-cccccccccccc"
+    }
+  }
+
+  mock_resource "castai_evictor" {
     defaults = {
       id = "cccccccc-cccc-cccc-cccc-cccccccccccc"
     }
@@ -117,5 +123,101 @@ run "impersonation_onboarding" {
   assert {
     condition     = castai_gke_cluster.castai_cluster.castai_service_account_email == "castai-gke-impersonator@castai-organization.iam.gserviceaccount.com"
     error_message = "castai_service_account_email should be passed to the cluster registration"
+  }
+}
+
+run "separate_autoscaler_policies_and_evictor_settings" {
+  command = plan
+
+  variables {
+    target_service_account_email = "castai-gke-tf-abc12345@test-project.iam.gserviceaccount.com"
+    castai_service_account_email = "castai-gke-impersonator@castai-organization.iam.gserviceaccount.com"
+    autoscaler_settings = {
+      enabled     = true
+      scoped_mode = true
+      unschedulable_pods = {
+        enabled                            = true
+        partial_template_matching_enabled = true
+      }
+      node_downscaler = {
+        empty_nodes_enabled = true
+        empty_nodes_delay   = "120s"
+      }
+    }
+    evictor_settings = {
+      enabled = true
+      dry_run = true
+    }
+  }
+
+  assert {
+    condition     = castai_autoscaler_policies.castai_autoscaler_policies[0].scoped_mode == true
+    error_message = "Autoscaler policies should use the V2 scoped_mode field"
+  }
+
+  assert {
+    condition     = castai_autoscaler_policies.castai_autoscaler_policies[0].unschedulable_pods[0].partial_template_matching_enabled == true
+    error_message = "Partial template matching should be nested under unschedulable_pods"
+  }
+
+  assert {
+    condition     = castai_autoscaler_policies.castai_autoscaler_policies[0].node_downscaler[0].empty_nodes_delay == "120s"
+    error_message = "Node downscaler should use the V2 empty_nodes_delay duration"
+  }
+
+  assert {
+    condition     = castai_evictor.castai_evictor[0].enabled == true && castai_evictor.castai_evictor[0].dry_run == true
+    error_message = "Evictor settings should be mapped independently from autoscaler policies"
+  }
+}
+
+run "null_autoscaler_and_evictor_settings" {
+  command = plan
+
+  variables {
+    target_service_account_email = "castai-gke-tf-abc12345@test-project.iam.gserviceaccount.com"
+    castai_service_account_email = "castai-gke-impersonator@castai-organization.iam.gserviceaccount.com"
+  }
+
+  assert {
+    condition     = length(castai_autoscaler_policies.castai_autoscaler_policies) == 0
+    error_message = "Null autoscaler settings should not create a policies resource"
+  }
+
+  assert {
+    condition     = length(castai_evictor.castai_evictor) == 0
+    error_message = "Null evictor settings should not create an evictor resource"
+  }
+}
+
+run "policy_settings_without_optional_nested_blocks" {
+  command = plan
+
+  variables {
+    target_service_account_email = "castai-gke-tf-abc12345@test-project.iam.gserviceaccount.com"
+    castai_service_account_email = "castai-gke-impersonator@castai-organization.iam.gserviceaccount.com"
+    autoscaler_settings = {
+      enabled = true
+    }
+  }
+
+  assert {
+    condition     = length(castai_autoscaler_policies.castai_autoscaler_policies[0].unschedulable_pods) == 0
+    error_message = "Unset unschedulable_pods should not emit a default block"
+  }
+
+  assert {
+    condition     = length(castai_autoscaler_policies.castai_autoscaler_policies[0].cluster_limits) == 0
+    error_message = "Unset cluster_limits should not emit a default block"
+  }
+
+  assert {
+    condition     = length(castai_autoscaler_policies.castai_autoscaler_policies[0].node_downscaler) == 0
+    error_message = "Unset node_downscaler should not emit a default block"
+  }
+
+  assert {
+    condition     = length(castai_evictor.castai_evictor) == 0
+    error_message = "Evictor should remain independent and unset"
   }
 }
