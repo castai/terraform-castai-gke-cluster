@@ -247,6 +247,33 @@ run "null_autoscaler_and_evictor_settings" {
     condition     = length(castai_evictor.castai_evictor) == 0
     error_message = "Null evictor settings should not create an evictor resource"
   }
+
+  assert {
+    condition     = anytrue([for s in helm_release.castai_evictor[0].set : s.name == "evictorEnabled" && s.value == "false"])
+    error_message = "Null evictor settings should pass evictorEnabled=false"
+  }
+}
+
+run "explicitly_disabled_evictor" {
+  command = plan
+
+  variables {
+    target_service_account_email = "castai-gke-tf-abc12345@test-project.iam.gserviceaccount.com"
+    castai_service_account_email = "castai-gke-impersonator@castai-organization.iam.gserviceaccount.com"
+    evictor_settings = {
+      enabled = false
+    }
+  }
+
+  assert {
+    condition     = castai_evictor.castai_evictor[0].enabled == false
+    error_message = "Explicit false should create a disabled evictor policy"
+  }
+
+  assert {
+    condition     = anytrue([for s in helm_release.castai_evictor[0].set : s.name == "evictorEnabled" && s.value == "false"])
+    error_message = "Explicit false should pass evictorEnabled=false"
+  }
 }
 
 run "policy_settings_without_optional_nested_blocks" {
