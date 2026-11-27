@@ -687,6 +687,8 @@ module "castai-gke-cluster" {
 
 Autoscaler policies are managed by `castai_autoscaler_policies`. Evictor is managed independently by `castai_evictor` and can be configured without setting `autoscaler_settings`. Other autoscaler policy fields retain their previous structure.
 
+All optional fields of the [`castai_evictor`](https://registry.terraform.io/providers/castai/castai/latest/docs/resources/evictor) resource are supported in `evictor_settings`, including `pricing_model` (a one-element list) and `timeouts` (a map with `create` and `update`).
+
 # Examples
 
 Usage examples are located in [terraform provider repo](https://github.com/castai/terraform-provider-castai/tree/master/examples/gke)
@@ -779,7 +781,7 @@ Usage examples are located in [terraform provider repo](https://github.com/casta
 | <a name="input_delete_nodes_on_disconnect"></a> [delete\_nodes\_on\_disconnect](#input\_delete\_nodes\_on\_disconnect) | Optionally delete Cast AI created nodes when the cluster is destroyed | `bool` | `false` | no |
 | <a name="input_evictor_ext_values"></a> [evictor\_ext\_values](#input\_evictor\_ext\_values) | List of YAML formatted string with evictor-ext values | `list(string)` | `[]` | no |
 | <a name="input_evictor_ext_version"></a> [evictor\_ext\_version](#input\_evictor\_ext\_version) | Version of castai-evictor-ext chart. Default latest | `string` | `null` | no |
-| <a name="input_evictor_settings"></a> [evictor\_settings](#input\_evictor\_settings) | Optional Evictor configuration mapped independently to the castai\_evictor resource | `any` | `null` | no |
+| <a name="input_evictor_settings"></a> [evictor\_settings](#input\_evictor\_settings) | Optional Evictor configuration. Supports every optional field of the castai\_evictor resource. | `any` | `null` | no |
 | <a name="input_evictor_values"></a> [evictor\_values](#input\_evictor\_values) | List of YAML formatted string values for evictor helm chart | `list(string)` | `[]` | no |
 | <a name="input_evictor_version"></a> [evictor\_version](#input\_evictor\_version) | Version of castai-evictor chart. Default latest | `string` | `null` | no |
 | <a name="input_gke_cluster_location"></a> [gke\_cluster\_location](#input\_gke\_cluster\_location) | Location of the cluster to be connected to CAST AI. Can be region or zone for zonal clusters | `string` | n/a | yes |
